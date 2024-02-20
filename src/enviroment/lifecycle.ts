@@ -13,7 +13,7 @@ const lifecycleManager: LifecycleManager = {
      * @param {Creep} creep - The creep to check and manage.
      */
     checkEndOfLife(creep: Creep): void {
-        if (creep.ticksToLive && creep.ticksToLive <= 180 && creep.store.getUsedCapacity() === 0) {
+        if (creep.ticksToLive && creep.ticksToLive <= 180 && creep.store.getUsedCapacity() === 0 && creep.memory.role !== 'harvester') {
             Memory.replacementsNeeded = Memory.replacementsNeeded || [];
             Memory.replacementsNeeded.push(creep.memory.role);
             console.log(`Creep ${creep.name} marked for replacement.`);
