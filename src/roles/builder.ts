@@ -1,3 +1,5 @@
+import { scavengerAttribute } from "attributes";
+
 export const roleBuilder = {
 
     /** @param {Creep} creep **/
@@ -5,7 +7,7 @@ export const roleBuilder = {
 
 	    if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.building = false;
-            creep.say('🔄 harvest');
+            creep.say('🔄 haul');
 	    }
 	    if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
 	        creep.memory.building = true;
@@ -20,24 +22,7 @@ export const roleBuilder = {
                 }
             }
 	    } else {
-	        var containers = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_CONTAINER ||
-                            structure.structureType == STRUCTURE_STORAGE) &&
-                            structure.store[RESOURCE_ENERGY] > 0;
-                }
-            });
-
-            if(containers.length > 0) {
-                if(creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(containers[0], {visualizePathStyle: {stroke: '#ffaa00'}});
-                }
-            } else {
-                var sources = creep.room.find(FIND_SOURCES_ACTIVE);
-                if(sources.length > 0 && creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0], {visualizePathStyle: {stroke: '#ffaa00'}});
-                }
-            }
+            scavengerAttribute(creep);
 	    }
 	}
 };

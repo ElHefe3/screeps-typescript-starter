@@ -6,6 +6,28 @@ interface LifecycleManager {
     cleanUpMemory(): void;
 }
 
+const containers = (creep: Creep): StructureContainer[]  => creep.room.find(FIND_STRUCTURES, {
+    filter: (structure) => {
+        return structure.structureType === STRUCTURE_CONTAINER &&
+               creep.room.controller &&
+               creep.room.controller.my;
+    }
+})
+
+
+const getTargetContainer = (creep: Creep) => {
+    const containersWithFreeCapacity = containers(creep).filter(container =>
+        container.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+    );
+
+    const sortedContainers = containersWithFreeCapacity.sort((a, b) =>
+        b.store.getFreeCapacity(RESOURCE_ENERGY) - a.store.getFreeCapacity(RESOURCE_ENERGY)
+    );
+
+    return sortedContainers.length > 0 ? sortedContainers[0] : undefined;
+};
+
+
 const lifecycleManager: LifecycleManager = {
 
     /**
@@ -13,11 +35,17 @@ const lifecycleManager: LifecycleManager = {
      * @param {Creep} creep - The creep to check and manage.
      */
     checkEndOfLife(creep: Creep): void {
-        if (creep.ticksToLive && creep.ticksToLive <= 180 && creep.store.getUsedCapacity() === 0) {
+        if (creep.ticksToLive && creep.ticksToLive <= 180 && creep.store.getUsedCapacity() === 0 && creep.memory.role !== 'harvester') {
             Memory.replacementsNeeded = Memory.replacementsNeeded || [];
             Memory.replacementsNeeded.push(creep.memory.role);
             console.log(`Creep ${creep.name} marked for replacement.`);
             creep.suicide();
+        }
+        else if (creep.ticksToLive && creep.ticksToLive <= 180 && creep.memory.role !== 'hauler') {
+            const targetContainer = getTargetContainer(creep);
+            if (targetContainer && creep.transfer(targetContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(targetContainer, {visualizePathStyle: {stroke: '#ffaa00'}});
+            }
         }
     },
 
