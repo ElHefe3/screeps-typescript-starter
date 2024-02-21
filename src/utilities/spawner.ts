@@ -1,6 +1,6 @@
-export const spawnCreepWithRole = (spawnName: string, role: string, bodyParts?: BodyPartConstant[]) => {
+export const spawnCreepWithRole = (spawnName: string, role: string) => {
     const newName = role + Game.time;
-    const body = bodyParts ?? [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+    const body = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
     const memory: CreepMemory = {
         role: role,
         room: "",

@@ -1,18 +1,7 @@
-/** @param {Creep} creep **/
-
 export const roleMaintainer = {
     run(creep: Creep): void {
-        const closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < ( structure.hitsMax * 0.8 )
-        });
 
-        if(closestDamagedStructure) {
-            if(creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(closestDamagedStructure, {visualizePathStyle: {stroke: '#ffaa00'}});
-            }
-            return;
-        }
-
+        /** @param {Creep} creep **/
         if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.building = false;
             creep.say('🔄 harvest');

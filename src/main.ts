@@ -1,5 +1,5 @@
 import lifecycleManager from "enviroment/lifecycle";
-import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, roleHauler } from "roles";
+import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer } from "roles";
 import { spawnCreepWithRole } from "utilities";
 import { ErrorMapper } from "utils/ErrorMapper";
 
@@ -32,10 +32,9 @@ declare global {
   }
 }
 
-const MAX_HARVESTERS = 2;
-const MAX_BUILDERS = 4;
-const MAX_UPGRADERS = 5;
-const MAX_HAULERS = 4;
+const MAX_HARVESTERS = 3;
+const MAX_BUILDERS = 1;
+const MAX_UPGRADERS = 3;
 
 var tickCount = 0;
 var cpuOverTime = 0;
@@ -69,13 +68,15 @@ export const loop = ErrorMapper.wrapLoop(() => {
       {align: 'left', opacity: 0.8}
   );
 
+
+  //console.log(`CPU Used: ${Game.cpu.getUsed()}, CPU Limit: ${Game.cpu.limit}`);
+
   const harvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
   const builders = _.filter(Game.creeps, (creep) => creep.memory.role === 'builder');
   const upgraders = _.filter(Game.creeps, (creep) => creep.memory.role === 'upgrader');
-  const haulers = _.filter(Game.creeps, (creep) => creep.memory.role === 'hauler');
 
   if(harvesters.length < MAX_HARVESTERS) {
-      spawnCreepWithRole('Spawn1', 'harvester', [WORK, WORK, WORK, WORK, WORK, MOVE]);
+      spawnCreepWithRole('Spawn1', 'harvester');
   }
 
   else if(builders.length < MAX_BUILDERS) {
@@ -85,45 +86,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
   else if(upgraders.length < MAX_UPGRADERS) {
       spawnCreepWithRole('Spawn1', 'upgrader');
   }
-
-  else if(haulers.length < MAX_HAULERS) {
-      spawnCreepWithRole('Spawn1', 'hauler', [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE]);
-  }
-
-  new RoomVisual().text(
-    `Creeps `,
-    2,
-    2,
-    {align: 'left', opacity: 0.8, color: 'green', strokeWidth: 2}
-  );
-
-  new RoomVisual().text(
-    `Harvesters: ${harvesters.length} / ${MAX_HARVESTERS}`,
-    2,
-    3,
-    {align: 'left', opacity: 0.8}
-  );
-
-  new RoomVisual().text(
-    `Builders: ${builders.length} / ${MAX_BUILDERS}`,
-    2,
-    4,
-    {align: 'left', opacity: 0.8}
-  );
-
-  new RoomVisual().text(
-    `Upgraders: ${upgraders.length} / ${MAX_UPGRADERS}`,
-    2,
-    5,
-    {align: 'left', opacity: 0.8}
-  );
-
-  new RoomVisual().text(
-    `Haulers: ${haulers.length} / ${MAX_HAULERS}`,
-    2,
-    6,
-    {align: 'left', opacity: 0.8}
-  );
 
   // var tower = Game.getObjectById('c75fbe01690966767058b908');
   // if(tower) {
@@ -165,9 +127,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
           } else {
               roleUpgrader.run(creep);
           }
-      }
-      if(creep.memory.role == 'hauler') {
-          roleHauler(creep);
       }
   }
 });
