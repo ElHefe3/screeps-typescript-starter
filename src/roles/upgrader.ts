@@ -1,4 +1,4 @@
-import { shyAttribute } from "attributes";
+import { scavengerAttribute } from "attributes";
 
 export const roleUpgrader = {
 
@@ -7,7 +7,7 @@ export const roleUpgrader = {
 
         if(creep.memory.upgrading && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.upgrading = false;
-            creep.say('🔄 harvest');
+            creep.say('🔄 haul');
 	    }
 	    if(!creep.memory.upgrading && creep.store.getFreeCapacity() == 0) {
 	        creep.memory.upgrading = true;
@@ -22,7 +22,7 @@ export const roleUpgrader = {
             }
         }
         else {
-            shyAttribute(creep);
+            scavengerAttribute(creep);
         }
 	}
 };
