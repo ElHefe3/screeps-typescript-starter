@@ -2,6 +2,7 @@ import { scavengerAttribute } from "attributes";
 
 import { roleUpgrader } from "./upgrader";
 
+
 export const roleHauler = (creep: Creep) => {
     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
         const target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {

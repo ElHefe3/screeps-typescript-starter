@@ -33,9 +33,9 @@ declare global {
 }
 
 const MAX_HARVESTERS = 2;
-const MAX_BUILDERS = 2;
-const MAX_UPGRADERS = 4;
-const MAX_HAULERS = 2;
+const MAX_BUILDERS = 4;
+const MAX_UPGRADERS = 5;
+const MAX_HAULERS = 4;
 
 var tickCount = 0;
 var cpuOverTime = 0;
