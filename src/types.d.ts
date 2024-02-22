@@ -8,6 +8,7 @@ declare global {
     building?: boolean;
     upgrading?: boolean;
     maintaining?: boolean;
+    hauling?: boolean;
     structureBeingRepaired?: string;
     _trav?: TravelData; // Make sure this matches the structure used by Traveler
     _travel?: any; // If this is used, define a more specific type if possible
