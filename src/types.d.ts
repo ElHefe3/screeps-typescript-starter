@@ -12,16 +12,23 @@ declare global {
     structureBeingRepaired?: string;
     _trav?: TravelData; // Make sure this matches the structure used by Traveler
     _travel?: any; // If this is used, define a more specific type if possible
+    destination?: {
+      roomName: string;
+      x: number;
+      y: number;
+    };
   }
 
   interface RoomMemory {
     avoid?: number;
+    maintainedObjects?: string[];
   }
 
   // Ensure Memory interface correctly declares any custom properties you use.
   interface Memory {
     replacementsNeeded: string[];
     empire: any;
+    claimedStructures: any;
     // Add any other custom properties used by your scripts.
   }
 
