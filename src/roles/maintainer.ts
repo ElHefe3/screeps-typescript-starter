@@ -10,17 +10,16 @@ export const roleMaintainer = {
             if(creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
                 creep.travelTo(closestDamagedStructure);
             }
-            return;
         }
 
-        if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
-            creep.memory.building = false;
-            creep.say('🔄 harvest');
+        if(creep.memory.maintaining && creep.store[RESOURCE_ENERGY] == 0) {
+            creep.memory.maintaining = false;
+            creep.say('🔄 gaterin\'');
         }
 
-        if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
-            creep.memory.building = true;
-            creep.say('🚧 Repair');
+        if(!creep.memory.maintaining && creep.store.getFreeCapacity() == 0) {
+            creep.memory.maintaining = true;
+            creep.say('🛠️ fixin\'');
         }
 
         var structuresToRepair = creep.room.find(FIND_STRUCTURES, {

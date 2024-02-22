@@ -7,6 +7,7 @@ declare global {
     harvesting?: boolean; // Mark optional properties with ?
     building?: boolean;
     upgrading?: boolean;
+    maintaining?: boolean;
     _trav?: TravelData; // Make sure this matches the structure used by Traveler
     _travel?: any; // If this is used, define a more specific type if possible
   }
