@@ -1,3 +1,5 @@
+import { erroring } from "roles/error";
+
 export const scavengerAttribute = (creep: Creep) => {
     let targetResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
     let targetContainer: StructureContainer | null = null;
@@ -18,5 +20,8 @@ export const scavengerAttribute = (creep: Creep) => {
         if(creep.withdraw(targetContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.travelTo(targetContainer);
         }
+    }
+    else {
+        erroring.run(creep);
     }
 }

@@ -39,8 +39,8 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer']
 const MAX_CREEPS = {
   HARVESTER: 2,
   BUILDER: 4,
-  UPGRADER: 5,
-  HAULER: 4,
+  UPGRADER: 4,
+  HAULER: 5,
   MAINTAINER: 2,
 };
 
@@ -76,6 +76,13 @@ export const loop = ErrorMapper.wrapLoop(() => {
       {align: 'left', opacity: 0.8}
   );
 
+  for (const id in Memory.claimedStructures) {
+    const structure = Game.getObjectById(id) as AnyStructure;
+    if (!structure || structure.hits === structure.hitsMax) {
+      delete Memory.claimedStructures[id];
+    }
+  }
+
   const harvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
   const builders = _.filter(Game.creeps, (creep) => creep.memory.role === 'builder');
   const upgraders = _.filter(Game.creeps, (creep) => creep.memory.role === 'upgrader');
@@ -91,7 +98,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   }
 
   else if(upgraders.length < MAX_CREEPS.UPGRADER) {
-      spawnCreepWithRole('Spawn1', 'upgrader');
+      spawnCreepWithRole('Spawn1', 'upgrader'), [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE];
   }
 
   else if(haulers.length < MAX_CREEPS.HAULER) {
