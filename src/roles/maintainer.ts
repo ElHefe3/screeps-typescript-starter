@@ -8,7 +8,7 @@ export const roleMaintainer = {
 
         if(closestDamagedStructure) {
             if(creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(closestDamagedStructure, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.travelTo(closestDamagedStructure);
             }
             return;
         }
@@ -32,7 +32,7 @@ export const roleMaintainer = {
         if(creep.memory.building) {
                 if(structuresToRepair.length > 0) {
                     if(creep.repair(structuresToRepair[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(structuresToRepair[0], {visualizePathStyle: {stroke: '#ffaa00'}});
+                        creep.travelTo(structuresToRepair[0]);
                     }
                 }
         } else {
@@ -46,12 +46,12 @@ export const roleMaintainer = {
 
             if(containers.length > 0) {
                 if(creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(containers[0], {visualizePathStyle: {stroke: '#ffaa00'}});
+                    creep.travelTo(containers[0]);
                 }
             } else {
                 var sources = creep.room.find(FIND_SOURCES_ACTIVE);
                 if(sources.length > 0 && creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0], {visualizePathStyle: {stroke: '#ffaa00'}});
+                    creep.travelTo(sources[0]);
                 }
             }
         }

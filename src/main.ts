@@ -1,7 +1,9 @@
+import { defenseTower } from "enviroment";
 import lifecycleManager from "enviroment/lifecycle";
 import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, roleHauler } from "roles";
 import { spawnCreepWithRole } from "utilities";
 import { ErrorMapper } from "utils/ErrorMapper";
+import "enviroment/utils";
 
 declare global {
   /*
@@ -40,12 +42,12 @@ const MAX_HAULERS = 4;
 var tickCount = 0;
 var cpuOverTime = 0;
 
-// When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
-// This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
   if (Game.time % 1000 === 0) {
       Memory.replacementsNeeded = [];
   }
+
+  defenseTower.run('65d72dfdab0f7711d3a110f4');
 
   lifecycleManager.cleanUpMemory();
 
@@ -124,21 +126,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
     6,
     {align: 'left', opacity: 0.8}
   );
-
-  // var tower = Game.getObjectById('c75fbe01690966767058b908');
-  // if(tower) {
-  //     var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-  //         filter: (structure) => structure.hits < structure.hitsMax
-  //     });
-  //     if(closestDamagedStructure) {
-  //         tower.repair(closestDamagedStructure);
-  //     }
-
-  //     var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-  //     if(closestHostile) {
-  //         tower.attack(closestHostile);
-  //     }
-  // }
 
   for(var name in Game.creeps) {
 
