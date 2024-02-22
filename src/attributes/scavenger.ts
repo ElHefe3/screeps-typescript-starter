@@ -14,7 +14,7 @@ export const scavengerAttribute = (creep: Creep) => {
         if(creep.pickup(targetResource) === ERR_NOT_IN_RANGE) {
             creep.travelTo(targetResource);
         }
-    } else if (targetContainer) {
+    } else if (targetContainer && targetContainer.id !== '65d7b6e3ab0f7711d3a144a2') {
         if(creep.withdraw(targetContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.travelTo(targetContainer);
         }
