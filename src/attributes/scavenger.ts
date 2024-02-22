@@ -12,11 +12,11 @@ export const scavengerAttribute = (creep: Creep) => {
 
     if (targetResource) {
         if(creep.pickup(targetResource) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(targetResource, {visualizePathStyle: {stroke: '#ffaa00'}});
+            creep.travelTo(targetResource);
         }
     } else if (targetContainer) {
         if(creep.withdraw(targetContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(targetContainer, {visualizePathStyle: {stroke: '#ffaa00'}});
+            creep.travelTo(targetContainer);
         }
     }
 }

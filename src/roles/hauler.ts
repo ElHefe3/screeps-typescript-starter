@@ -16,7 +16,7 @@ export const roleHauler = (creep: Creep) => {
 
         if (target) {
             if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.travelTo(target);
             }
         } else {
             roleUpgrader.run(creep);

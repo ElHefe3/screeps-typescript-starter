@@ -44,7 +44,7 @@ const lifecycleManager: LifecycleManager = {
         else if (creep.ticksToLive && creep.ticksToLive <= 180 && creep.memory.role !== 'hauler') {
             const targetContainer = getTargetContainer(creep);
             if (targetContainer && creep.transfer(targetContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(targetContainer, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.travelTo(targetContainer);
             }
         }
     },
