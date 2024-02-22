@@ -1,18 +1,15 @@
 import { scavengerAttribute } from "attributes";
 
-import { roleUpgrader } from "./upgrader";
-
-
 export const roleHauler = (creep: Creep) => {
 
     if (creep.memory.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
-        creep.say('🔄 haul');
+        creep.say('🔄');
     }
 
     if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {
         creep.memory.hauling = true;
-        creep.say('🚚 deliver\'n');
+        creep.say('🚚');
     }
 
     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
