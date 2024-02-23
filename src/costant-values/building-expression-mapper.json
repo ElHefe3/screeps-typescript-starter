@@ -1,0 +1,32 @@
+{
+  "RESOURCE": {
+    "emoticon": "🏭"
+  },
+  "SPAWN": {
+    "emoticon": "🏰"
+  },
+  "TOWER": {
+    "emoticon": "🗼"
+  },
+  "EXTENSION": {
+    "emoticon": "🏢"
+  },
+  "ROAD": {
+    "emoticon": "🛣️"
+  },
+  "RAMPART": {
+    "emoticon": "🛡️"
+  },
+  "LINK": {
+    "emoticon": "🔗"
+  },
+  "WALL": {
+    "emoticon": "🧱"
+  },
+  "KEEPER_LAIR": {
+    "emoticon": "🕸️"
+  },
+  "PORTAL": {
+    "emoticon": "🌀"
+  }
+}

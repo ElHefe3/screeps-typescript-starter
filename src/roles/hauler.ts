@@ -1,10 +1,11 @@
 import { scavengerAttribute } from "attributes";
 
 export const roleHauler = (creep: Creep) => {
+    //const { EXTENSION, RESOURCE } = buildingExpressionMapper;
 
     if (creep.memory.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
-        creep.say('🔄');
+        creep.say("yeehaw");
     }
 
     if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {
@@ -31,7 +32,7 @@ export const roleHauler = (creep: Creep) => {
 
         if (creep.memory.hauling && target !== null) {
             if(target.id === '65d7b6e3ab0f7711d3a144a2') {
-                creep.say('🧟‍♂️ahh')
+                creep.say("anywhere but here")
             } else {
                 creep.say('🚚 haulin\'');
             };

@@ -4,6 +4,7 @@ declare global {
   // Extend CreepMemory with properties used by your Traveler.
   interface CreepMemory {
     role: string;
+    errors: string[];
     harvesting?: boolean; // Mark optional properties with ?
     building?: boolean;
     upgrading?: boolean;
