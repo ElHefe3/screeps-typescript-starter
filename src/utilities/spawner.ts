@@ -5,9 +5,7 @@ export const spawnCreepWithRole = (spawnName: string, role: string, bodyParts?: 
         role: role,
         room: "",
         working: false,
-        harvesting: false,
-        building: false,
-        upgrading: false
+        errors: []
     };
 
     const spawnResult = Game.spawns[spawnName].spawnCreep(body, newName, { memory: memory });

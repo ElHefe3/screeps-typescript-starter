@@ -1,3 +1,4 @@
+export * from './priority-hauler';
 export * from './maintainer';
 export * from './harvester';
 export * from './upgrader';
