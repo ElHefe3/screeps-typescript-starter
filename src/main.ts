@@ -29,7 +29,7 @@ declare global {
     working: boolean;
   }
 
-  // Syntax for adding proprties to `global` (ex "global.log")
+  // Syntax for adding properties to `global` (ex "global.log")
   namespace NodeJS {
     interface Global {
       log: any;
@@ -41,10 +41,10 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer']
 
 const MAX_CREEPS = {
   HARVESTER: 2,
-  BUILDER: 4,
-  UPGRADER: 5,
-  HAULER: 5,
-  MAINTAINER: 2,
+  BUILDER: 2,
+  UPGRADER: 4,
+  HAULER: 4,
+  MAINTAINER: 1,
 };
 
 var tickCount = 0;
@@ -105,7 +105,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   }
 
   else if(haulers.length < MAX_CREEPS.HAULER) {
-      spawnCreepWithRole('Spawn1', 'hauler', [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE]);
+      spawnCreepWithRole('Spawn1', 'hauler', [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE]);
   }
 
   else if(maintainers.length < MAX_CREEPS.MAINTAINER) {

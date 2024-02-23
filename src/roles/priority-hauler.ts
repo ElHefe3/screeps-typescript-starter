@@ -9,11 +9,21 @@ export const rolePriorityHauler = (creep: Creep) => {
         creep?.memory?.destination?.roomName ?? 'W8N7'
     );
 
-    // 💡 info: for drawing on screen
-    new RoomVisual(creep.room.name).circle(destination, {fill: 'transparent', radius: 0.55, stroke: 'red'});
+    const priorityBuildingsFlag = Game.flags["priority-buildings-border"];
 
-    // 💡 info: line between creep and destination
-    new RoomVisual(creep.room.name).line(creep.pos, destination, {color: 'red'});
+    const isPriorityBuildingsOn = priorityBuildingsFlag?.color === COLOR_BLUE;
+
+    const intentionTrackingFlag = Game.flags["intention-tracking"];
+    const isIntentionTrackingOn = intentionTrackingFlag && intentionTrackingFlag?.color === COLOR_BLUE;
+
+    if (isIntentionTrackingOn){
+        // 💡 info: for drawing on screen
+        new RoomVisual(creep.room.name).circle(destination, {fill: 'transparent', radius: 0.55, stroke: 'red'});
+        // 💡 info: line between creep and destination
+        new RoomVisual(creep.room.name).line(creep.pos, destination, {color: 'red'});
+    }
+
+
 
     if (creep.memory?.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
@@ -55,10 +65,12 @@ export const rolePriorityHauler = (creep: Creep) => {
         creep.memory.destination = prioritizedStructures[0].pos;
         creep.say(`🚚`);
 
-        // encircle all prioritized structures
-        prioritizedStructures.forEach((structure) => {
-            new RoomVisual(creep.room.name).circle(structure.pos, {fill: 'transparent', radius: 0.55, stroke: 'green'});
-        });
+        if (isPriorityBuildingsOn) {
+            // 💡 info: encircle all prioritized structures
+            prioritizedStructures.forEach((structure) => {
+                new RoomVisual(creep.room.name).circle(structure.pos, {fill: 'transparent', radius: 0.55, stroke: 'green'});
+            });
+        }
 
         // todo: figure ot this typing issue
         const target: StructureSpawn | StructureExtension | StructureTower = prioritizedStructures[0] as StructureSpawn | StructureExtension | StructureTower;

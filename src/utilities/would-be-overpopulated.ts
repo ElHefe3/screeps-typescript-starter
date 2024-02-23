@@ -1,5 +1,3 @@
-import { Position } from "source-map";
-
 /**
  * Checks if adding another creep to the specified location would cause overpopulation.
  * @param {RoomPosition} position - The location to check.
