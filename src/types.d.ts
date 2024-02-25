@@ -13,11 +13,7 @@ declare global {
     structureBeingRepaired?: string;
     _trav?: TravelData; // Make sure this matches the structure used by Traveler
     _travel?: any; // If this is used, define a more specific type if possible
-    destination?: {
-      roomName: string;
-      x: number;
-      y: number;
-    };
+    destination?: RoomPosition;
   }
 
   interface RoomMemory {

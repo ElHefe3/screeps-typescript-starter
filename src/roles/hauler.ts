@@ -1,11 +1,14 @@
 import { scavengerAttribute } from "attributes";
+import { buildingExpressionMapper } from "constant-values";
+import { reaction } from "utilities/reaction";
 
 export const roleHauler = (creep: Creep) => {
-    //const { EXTENSION, RESOURCE } = buildingExpressionMapper;
+    const { EXTENSION, RESOURCE } = buildingExpressionMapper;
+
 
     if (creep.memory.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
-        creep.say("yeehaw");
+        creep.say(RESOURCE.emoticon);
     }
 
     if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {

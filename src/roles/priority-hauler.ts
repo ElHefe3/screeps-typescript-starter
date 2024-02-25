@@ -1,6 +1,7 @@
 // todo: use the creep's memory alongside their limb count to determine if they are overpopulated
 
 import { scavengerAttribute } from "attributes";
+import { reaction } from "utilities";
 
 export const rolePriorityHauler = (creep: Creep) => {
     const destination = new RoomPosition(
@@ -10,7 +11,6 @@ export const rolePriorityHauler = (creep: Creep) => {
     );
 
     const priorityBuildingsFlag = Game.flags["priority-buildings-border"];
-
     const isPriorityBuildingsOn = priorityBuildingsFlag?.color === COLOR_BLUE;
 
     const intentionTrackingFlag = Game.flags["intention-tracking"];
@@ -27,12 +27,10 @@ export const rolePriorityHauler = (creep: Creep) => {
 
     if (creep.memory?.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
-        creep.say('🔄');
     }
 
     if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {
         creep.memory.hauling = true;
-        creep.say('🚚');
     }
 
     if (creep.memory.hauling) {
@@ -45,7 +43,7 @@ export const rolePriorityHauler = (creep: Creep) => {
                 structure.store?.getFreeCapacity(RESOURCE_ENERGY) > 0
         });
 
-        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
+        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;;
 
         const towers = creep.room.find(FIND_MY_STRUCTURES, {
             filter: (structure: StructureTower) =>
@@ -59,11 +57,13 @@ export const rolePriorityHauler = (creep: Creep) => {
         const prioritizedStructures = [
                 ...depletedSpawns,
                 ...extensions,
-                (doesControllerNeedsResource ? controllerStorage : {...towers})
+                ...towers,
+                (doesControllerNeedsResource ? controllerStorage : {...towers}),
             ] as (StructureSpawn | StructureExtension | StructureTower | StructureContainer)[];
 
+        reaction.run(creep, prioritizedStructures[0]);
+
         creep.memory.destination = prioritizedStructures[0].pos;
-        creep.say(`🚚`);
 
         if (isPriorityBuildingsOn) {
             // 💡 info: encircle all prioritized structures

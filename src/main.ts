@@ -1,12 +1,9 @@
 import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, rolePriorityHauler } from "roles";
-import { convertJsonToTsModule } from "utils/prebuilt-script";
 import lifecycleManager from "enviroment/lifecycle";
 import { ErrorMapper } from "utils/ErrorMapper";
 import { spawnCreepWithRole } from "utilities";
 import { defenseTower } from "enviroment";
 import "enviroment/utils";
-
-//convertJsonToTsModule('src/constant-values/building-expression-mapper.json', 'src/constant-values/building-expression-mapper.ts')
 
 declare global {
   /*
@@ -41,10 +38,10 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer']
 
 const MAX_CREEPS = {
   HARVESTER: 2,
-  BUILDER: 2,
-  UPGRADER: 4,
+  BUILDER: 3,
+  UPGRADER: 2,
   HAULER: 4,
-  MAINTAINER: 1,
+  MAINTAINER: 3,
 };
 
 var tickCount = 0;
@@ -55,7 +52,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
       Memory.replacementsNeeded = [];
   }
 
-  defenseTower.run('65d72dfdab0f7711d3a110f4');
+  defenseTower.run('65d908ccab0f7711d3a1c72f');
 
   lifecycleManager.cleanUpMemory();
 
@@ -101,7 +98,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   }
 
   else if(upgraders.length < MAX_CREEPS.UPGRADER) {
-      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]);
+      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]);
   }
 
   else if(haulers.length < MAX_CREEPS.HAULER) {
