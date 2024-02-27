@@ -1,4 +1,5 @@
 import { scavengerAttribute } from "attributes";
+import { walkThisWay } from "utilities";
 
 // Ensure Memory structure for claimed repairs
 if (!Memory.claimedStructures) {
@@ -34,6 +35,7 @@ export const roleMaintainer = {
         let otherStructuresToRepair = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => structure.structureType !== STRUCTURE_WALL &&
                                     structure.structureType !== STRUCTURE_CONTAINER &&
+                                    structure.structureType !== STRUCTURE_RAMPART &&
                                     structure.hits < structure.hitsMax
         });
 
@@ -47,22 +49,24 @@ export const roleMaintainer = {
         wallsToRepair.sort((a, b) => a.hits - b.hits);
 
         // Combine the sorted arrays
-        let structuresToRepair = [...containersToRepair, ...otherStructuresToRepair, ...wallsToRepair];
+        const structuresToRepair = [...containersToRepair, ...otherStructuresToRepair, ...wallsToRepair];
+
+        // filter structures not in the same room
+        const structuresToRepairSanitized = structuresToRepair.filter((structure) => structure.room.name === creep.room.name);
 
         if(creep.memory.maintaining) {
             let target = null;
             const structureBeingRepaired = Game.getObjectById(creep.memory.structureBeingRepaired ?? '') as AnyStructure;
 
-            // Attempt to claim and assign a new target if not already assigned or target is fully repaired
             if (!creep.memory.structureBeingRepaired ||
                 (creep.memory.structureBeingRepaired &&
-                 (!Memory.claimedStructures[creep.memory.structureBeingRepaired] ||
-                  structureBeingRepaired.hits === structureBeingRepaired.hitsMax))) {
-                for (const structure of structuresToRepair) {
+                (!Memory.claimedStructures[creep.memory.structureBeingRepaired] ||
+                structureBeingRepaired.hits === structureBeingRepaired.hitsMax))) {
+                for (const structure of structuresToRepairSanitized) {
                     if (!Memory.claimedStructures[structure.id]) {
                         target = structure;
-                        Memory.claimedStructures[structure.id] = true; // Mark as claimed
-                        creep.memory.structureBeingRepaired = structure.id; // Remember the target
+                        Memory.claimedStructures[structure.id] = true;
+                        creep.memory.structureBeingRepaired = structure.id;
                         break;
                     }
                 }
@@ -71,11 +75,8 @@ export const roleMaintainer = {
             }
 
             if (target) {
-                if (creep.repair(target) === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
-                }
+                walkThisWay.repair(creep, target);
                 if (target.hits === target.hitsMax) {
-                    // Repair complete, unclaim structure
                     delete Memory.claimedStructures[target.id];
                     delete creep.memory.structureBeingRepaired;
                 }

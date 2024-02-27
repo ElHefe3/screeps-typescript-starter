@@ -1,28 +1,29 @@
-import { erroring } from "roles/error";
+import { idle } from "roles/idle";
+import { walkThisWay } from "utilities";
+
+const CONTROLLED_CONTAINER = '65d7b6e3ab0f7711d3a144a2';
+const DEFAULT_CONTAINER = '65d79d88df997c11d97d9737';
 
 export const scavengerAttribute = (creep: Creep) => {
     let droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
-    let targetContainer: StructureContainer | null = null;
 
-    if (!droppedResource && !targetContainer) {
-        const containers = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => structure.structureType === STRUCTURE_CONTAINER &&
-                                   structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-        });
-        targetContainer = creep.pos.findClosestByPath(containers) as StructureContainer | null;
-        creep.memory.destination = targetContainer?.pos;
-    }
+    const containers = creep.room.find(FIND_STRUCTURES, {
+        filter: (structure) => structure.structureType === STRUCTURE_CONTAINER &&
+                                structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+    });
 
-    if (droppedResource) {
-        if(creep.pickup(droppedResource) === ERR_NOT_IN_RANGE) {
-            creep.travelTo(droppedResource);
-        }
-    } else if (targetContainer && targetContainer.id !== '65d7b6e3ab0f7711d3a144a2') {
-        if(creep.withdraw(targetContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-            creep.travelTo(targetContainer);
-        }
+    const targetContainer = creep.pos.findClosestByPath(containers) as StructureContainer | null;
+
+    creep.memory.destination = targetContainer?.pos;
+
+    if (targetContainer && targetContainer.id !== CONTROLLED_CONTAINER) {
+        walkThisWay.withdraw(creep, targetContainer);
     }
     else {
-        erroring.run(creep);
+        if(droppedResource) {
+            walkThisWay.pickup(creep, droppedResource);
+        } else {
+            idle.run(creep);
+        }
     }
 }

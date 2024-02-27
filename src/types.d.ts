@@ -13,16 +13,41 @@ declare global {
     structureBeingRepaired?: string;
     _trav?: TravelData; // Make sure this matches the structure used by Traveler
     _travel?: any; // If this is used, define a more specific type if possible
-    destination?: {
-      roomName: string;
-      x: number;
-      y: number;
-    };
+    destination?: RoomPosition;
   }
 
+  // type taskType = 'repair' | 'build' | 'upgrade' | 'haul' | 'scavenge';
+  // type taskStatus = 'pending' | 'in-progress';
+
+  // type Task = {
+  //   id: string;
+  //   type: taskType;
+  //   status: taskStatus;
+  // }
+
+  interface TaskData {
+    id: string;
+    type: string;
+    priority: number;
+    maxCreeps: number;
+    assignedCreeps: number;
+  }
+
+  // Define an interface for the TaskManager
+  interface TaskManager {
+    tasks: TaskData[];
+    addTask: (task: TaskData) => void;
+    removeTask: (taskId: string) => void;
+    getTasks: () => TaskData[];
+    // Any other methods you have in taskManager
+  }
+
+  // Extend the RoomMemory interface to include taskManager
   interface RoomMemory {
     avoid?: number;
     maintainedObjects?: string[];
+    maintenanceTaskList?: TaskData[];
+    taskManager?: TaskManager;
   }
 
   // Ensure Memory interface correctly declares any custom properties you use.
@@ -95,6 +120,8 @@ declare global {
   // Additional types used by your declarations.
   type Coord = { x: number; y: number; };
   type HasPos = { pos: RoomPosition; };
+
+  type CapacityEnabledStructures = StructureSpawn | StructureExtension | StructureTower | StructureStorage | StructureContainer;
 }
 
 export {};

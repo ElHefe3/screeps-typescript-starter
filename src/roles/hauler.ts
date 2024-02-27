@@ -1,11 +1,14 @@
 import { scavengerAttribute } from "attributes";
+import { buildingExpressionMapper } from "constant-values";
+import { walkThisWay } from "utilities";
 
 export const roleHauler = (creep: Creep) => {
-    //const { EXTENSION, RESOURCE } = buildingExpressionMapper;
+    const { EXTENSION, RESOURCE } = buildingExpressionMapper;
+
 
     if (creep.memory.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
-        creep.say("yeehaw");
+        creep.say(RESOURCE.emoticon);
     }
 
     if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {
@@ -37,9 +40,7 @@ export const roleHauler = (creep: Creep) => {
                 creep.say('🚚 haulin\'');
             };
 
-            if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.travelTo(target);
-            }
+            walkThisWay.transfer(creep, target);
         } else {
             creep.say('🔄');
             scavengerAttribute(creep);

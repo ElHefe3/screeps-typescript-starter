@@ -1,12 +1,9 @@
 import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, rolePriorityHauler } from "roles";
-import { convertJsonToTsModule } from "utils/prebuilt-script";
 import lifecycleManager from "enviroment/lifecycle";
 import { ErrorMapper } from "utils/ErrorMapper";
 import { spawnCreepWithRole } from "utilities";
 import { defenseTower } from "enviroment";
 import "enviroment/utils";
-
-//convertJsonToTsModule('src/constant-values/building-expression-mapper.json', 'src/constant-values/building-expression-mapper.ts')
 
 declare global {
   /*
@@ -41,10 +38,10 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer']
 
 const MAX_CREEPS = {
   HARVESTER: 2,
-  BUILDER: 2,
-  UPGRADER: 4,
+  BUILDER: 3,
+  UPGRADER: 3,
   HAULER: 4,
-  MAINTAINER: 1,
+  MAINTAINER: 3,
 };
 
 var tickCount = 0;
@@ -55,7 +52,21 @@ export const loop = ErrorMapper.wrapLoop(() => {
       Memory.replacementsNeeded = [];
   }
 
-  defenseTower.run('65d72dfdab0f7711d3a110f4');
+  RoomVisual.prototype.circle(29, 11, {fill: '#2A2A2A', radius: 1.1, opacity: 1});
+  const messageIndicationFlag = Game.flags['m'];
+  const messageButtonFlag = Game.flags['R'];
+
+  if(RawMemory.foreignSegment  && RawMemory.foreignSegment.username === 'Gambit' && RawMemory.foreignSegment.id === 1) {
+    messageIndicationFlag.setColor(COLOR_GREEN);
+    const messageData = JSON.parse(RawMemory.foreignSegment.data);
+
+    messageButtonFlag?.color === COLOR_GREEN &&
+      RoomVisual.prototype.text((messageData), 32, 10, {color: 'white', font: 0.2, align: 'right'});
+  } else {
+    messageIndicationFlag.setColor(COLOR_WHITE);
+  }
+
+  defenseTower.run('65d908ccab0f7711d3a1c72f');
 
   lifecycleManager.cleanUpMemory();
 
@@ -78,6 +89,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
       1,
       {align: 'left', opacity: 0.8}
   );
+
+  RoomVisual.prototype.circle(7, 24, {fill: '#2A2A2A', radius: 1.1, opacity: 1});
 
   for (const id in Memory.claimedStructures) {
     const structure = Game.getObjectById(id) as AnyStructure;
@@ -114,9 +127,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   new RoomVisual().text(
     `Creeps `,
-    2,
-    2,
-    {align: 'left', opacity: 0.8, color: 'green', strokeWidth: 2}
+    39,
+    1,
+    {align: 'left', opacity: 0.8, color: 'green', strokeWidth: 2, font: 0.4}
   );
 
   for (let i = 0; i < CREEP_NAMES.length; i++) {
@@ -125,9 +138,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
     const maxCreepNumber = MAX_CREEPS[creepName.toUpperCase() as keyof typeof MAX_CREEPS];
     new RoomVisual().text(
       `${creepName}: ${numberOfCreep} / ${maxCreepNumber}`,
-      2,
-      3 + i,
-      {align: 'left', opacity: 0.8}
+      39,
+      2 + i,
+      {align: 'left', opacity: 0.8, font: 0.3}
     );
   }
 
