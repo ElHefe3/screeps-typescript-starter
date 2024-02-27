@@ -1,9 +1,10 @@
 import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, rolePriorityHauler } from "roles";
-import lifecycleManager from "enviroment/lifecycle";
+import lifecycleManager from "environment/lifecycle";
 import { ErrorMapper } from "utils/ErrorMapper";
-import { spawnCreepWithRole } from "utilities";
-import { defenseTower } from "enviroment";
-import "enviroment/utils";
+import { defenseProtocol, spawnCreepWithRole } from "utilities";
+import { tower } from "environment";
+import "environment/utils";
+import { roleDefender } from "roles/attack-creeps";
 
 declare global {
   /*
@@ -38,10 +39,10 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer']
 
 const MAX_CREEPS = {
   HARVESTER: 2,
-  BUILDER: 3,
-  UPGRADER: 3,
+  BUILDER: 2,
+  UPGRADER: 1,
   HAULER: 4,
-  MAINTAINER: 3,
+  MAINTAINER: 1,
 };
 
 var tickCount = 0;
@@ -66,7 +67,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
     messageIndicationFlag.setColor(COLOR_WHITE);
   }
 
-  defenseTower.run('65d908ccab0f7711d3a1c72f');
+  defenseProtocol('65d908ccab0f7711d3a1c72f');
 
   lifecycleManager.cleanUpMemory();
 
@@ -114,7 +115,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   }
 
   else if(upgraders.length < MAX_CREEPS.UPGRADER) {
-      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]);
+      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE]);
   }
 
   else if(haulers.length < MAX_CREEPS.HAULER) {
@@ -174,6 +175,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
       }
       if(creep.memory.role == 'maintainer') {
           roleMaintainer.run(creep);
+      }
+      if(creep.memory.role == 'melee') {
+        roleDefender.run(creep);
+      }
+      if(creep.memory.role == 'ranged') {
+        roleDefender.run(creep);
       }
   }
 });

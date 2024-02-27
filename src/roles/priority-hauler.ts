@@ -60,13 +60,13 @@ export const rolePriorityHauler = (creep: Creep) => {
         const doesControllerNeedsResource =
             controllerStorage.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
 
-        const overflow: StructureContainer[] | StructureStorage[] = doesControllerNeedsResource ? [controllerStorage] : storage;
+        const overflow = doesControllerNeedsResource ? [controllerStorage] : towers;
 
         const prioritizedStructures = [
                 ...depletedSpawns,
                 ...extensions,
-                ...towers,
                 ...overflow,
+                ...towers,
                 ...storage,
             ] as CapacityEnabledStructures[];
 
