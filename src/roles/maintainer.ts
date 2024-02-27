@@ -1,4 +1,5 @@
 import { scavengerAttribute } from "attributes";
+import { walkThisWay } from "utilities";
 
 // Ensure Memory structure for claimed repairs
 if (!Memory.claimedStructures) {
@@ -34,6 +35,7 @@ export const roleMaintainer = {
         let otherStructuresToRepair = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => structure.structureType !== STRUCTURE_WALL &&
                                     structure.structureType !== STRUCTURE_CONTAINER &&
+                                    structure.structureType !== STRUCTURE_RAMPART &&
                                     structure.hits < structure.hitsMax
         });
 
@@ -58,8 +60,8 @@ export const roleMaintainer = {
 
             if (!creep.memory.structureBeingRepaired ||
                 (creep.memory.structureBeingRepaired &&
-                 (!Memory.claimedStructures[creep.memory.structureBeingRepaired] ||
-                  structureBeingRepaired.hits === structureBeingRepaired.hitsMax))) {
+                (!Memory.claimedStructures[creep.memory.structureBeingRepaired] ||
+                structureBeingRepaired.hits === structureBeingRepaired.hitsMax))) {
                 for (const structure of structuresToRepairSanitized) {
                     if (!Memory.claimedStructures[structure.id]) {
                         target = structure;
@@ -73,7 +75,7 @@ export const roleMaintainer = {
             }
 
             if (target) {
-                if (creep.repair(target) === ERR_NOT_IN_RANGE) creep.travelTo(target);
+                walkThisWay.repair(creep, target);
                 if (target.hits === target.hitsMax) {
                     delete Memory.claimedStructures[target.id];
                     delete creep.memory.structureBeingRepaired;

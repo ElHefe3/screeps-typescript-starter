@@ -1,7 +1,7 @@
 // todo: use the creep's memory alongside their limb count to determine if they are overpopulated
 
 import { scavengerAttribute } from "attributes";
-import { reaction } from "utilities";
+import { reaction, walkThisWay } from "utilities";
 
 export const rolePriorityHauler = (creep: Creep) => {
     const destination = new RoomPosition(
@@ -43,7 +43,7 @@ export const rolePriorityHauler = (creep: Creep) => {
                 structure.store?.getFreeCapacity(RESOURCE_ENERGY) > 0
         });
 
-        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;;
+        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureContainer;
 
         const towers = creep.room.find(FIND_MY_STRUCTURES, {
             filter: (structure: StructureTower) =>
@@ -51,15 +51,24 @@ export const rolePriorityHauler = (creep: Creep) => {
                 structure.store?.getFreeCapacity(RESOURCE_ENERGY) > 0
         });
 
+        const storage: StructureStorage[] = creep.room.find(FIND_MY_STRUCTURES, {
+            filter: (structure: StructureStorage) =>
+                structure.structureType === STRUCTURE_STORAGE &&
+                structure.store?.getFreeCapacity(RESOURCE_ENERGY) > 0
+        });
+
         const doesControllerNeedsResource =
             controllerStorage.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+
+        const overflow: StructureContainer[] | StructureStorage[] = doesControllerNeedsResource ? [controllerStorage] : storage;
 
         const prioritizedStructures = [
                 ...depletedSpawns,
                 ...extensions,
                 ...towers,
-                (doesControllerNeedsResource ? controllerStorage : {...towers}),
-            ] as (StructureSpawn | StructureExtension | StructureTower | StructureContainer)[];
+                ...overflow,
+                ...storage,
+            ] as CapacityEnabledStructures[];
 
         reaction.run(creep, prioritizedStructures[0]);
 
@@ -72,12 +81,9 @@ export const rolePriorityHauler = (creep: Creep) => {
             });
         }
 
-        // todo: figure ot this typing issue
-        const target: StructureSpawn | StructureExtension | StructureTower = prioritizedStructures[0] as StructureSpawn | StructureExtension | StructureTower;
+        const target: CapacityEnabledStructures = prioritizedStructures[0];
 
-        if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-            creep.travelTo(destination);
-        }
+        walkThisWay.transfer(creep, target);
 
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
             creep.memory.hauling = false;

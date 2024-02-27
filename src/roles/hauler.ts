@@ -1,6 +1,6 @@
 import { scavengerAttribute } from "attributes";
 import { buildingExpressionMapper } from "constant-values";
-import { reaction } from "utilities/reaction";
+import { walkThisWay } from "utilities";
 
 export const roleHauler = (creep: Creep) => {
     const { EXTENSION, RESOURCE } = buildingExpressionMapper;
@@ -40,9 +40,7 @@ export const roleHauler = (creep: Creep) => {
                 creep.say('🚚 haulin\'');
             };
 
-            if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.travelTo(target);
-            }
+            walkThisWay.transfer(creep, target);
         } else {
             creep.say('🔄');
             scavengerAttribute(creep);

@@ -39,7 +39,7 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer']
 const MAX_CREEPS = {
   HARVESTER: 2,
   BUILDER: 3,
-  UPGRADER: 2,
+  UPGRADER: 3,
   HAULER: 4,
   MAINTAINER: 3,
 };
@@ -50,6 +50,20 @@ var cpuOverTime = 0;
 export const loop = ErrorMapper.wrapLoop(() => {
   if (Game.time % 1000 === 0) {
       Memory.replacementsNeeded = [];
+  }
+
+  RoomVisual.prototype.circle(29, 11, {fill: '#2A2A2A', radius: 1.1, opacity: 1});
+  const messageIndicationFlag = Game.flags['m'];
+  const messageButtonFlag = Game.flags['R'];
+
+  if(RawMemory.foreignSegment  && RawMemory.foreignSegment.username === 'Gambit' && RawMemory.foreignSegment.id === 1) {
+    messageIndicationFlag.setColor(COLOR_GREEN);
+    const messageData = JSON.parse(RawMemory.foreignSegment.data);
+
+    messageButtonFlag?.color === COLOR_GREEN &&
+      RoomVisual.prototype.text((messageData), 32, 10, {color: 'white', font: 0.2, align: 'right'});
+  } else {
+    messageIndicationFlag.setColor(COLOR_WHITE);
   }
 
   defenseTower.run('65d908ccab0f7711d3a1c72f');
@@ -76,6 +90,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
       {align: 'left', opacity: 0.8}
   );
 
+  RoomVisual.prototype.circle(7, 24, {fill: '#2A2A2A', radius: 1.1, opacity: 1});
+
   for (const id in Memory.claimedStructures) {
     const structure = Game.getObjectById(id) as AnyStructure;
     if (!structure || structure.hits === structure.hitsMax) {
@@ -98,7 +114,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   }
 
   else if(upgraders.length < MAX_CREEPS.UPGRADER) {
-      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]);
+      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]);
   }
 
   else if(haulers.length < MAX_CREEPS.HAULER) {
@@ -111,9 +127,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   new RoomVisual().text(
     `Creeps `,
-    2,
-    2,
-    {align: 'left', opacity: 0.8, color: 'green', strokeWidth: 2}
+    39,
+    1,
+    {align: 'left', opacity: 0.8, color: 'green', strokeWidth: 2, font: 0.4}
   );
 
   for (let i = 0; i < CREEP_NAMES.length; i++) {
@@ -122,9 +138,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
     const maxCreepNumber = MAX_CREEPS[creepName.toUpperCase() as keyof typeof MAX_CREEPS];
     new RoomVisual().text(
       `${creepName}: ${numberOfCreep} / ${maxCreepNumber}`,
-      2,
-      3 + i,
-      {align: 'left', opacity: 0.8}
+      39,
+      2 + i,
+      {align: 'left', opacity: 0.8, font: 0.3}
     );
   }
 

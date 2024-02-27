@@ -1,4 +1,5 @@
 import { scavengerAttribute } from "attributes";
+import { idle } from "./idle";
 
 export const roleUpgrader = {
 
@@ -28,6 +29,12 @@ export const roleUpgrader = {
             }
 
             if(!controllerStorage) scavengerAttribute(creep);
+        }
+
+        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
+
+        if(controllerStorage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+            idle.run(creep);
         }
 	}
 };
