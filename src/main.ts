@@ -6,7 +6,7 @@ import { tower } from "environment";
 import "environment/utils";
 import { roleDefender } from "roles/attack-creeps";
 import { roleRemoteMiner } from "roles/remote-miner";
-import { roomManager, taskManager } from "core";
+import { cleanupCompletedTasks, roomManager, taskManager, completeAllTasksOfType } from "core";
 
 declare global {
   /*
@@ -52,8 +52,42 @@ var tickCount = 0;
 var cpuOverTime = 0;
 
 export const loop = ErrorMapper.wrapLoop(() => {
+  global.Function = global.Function || {};
+  global.Function.cleanupCompletedTasks = cleanupCompletedTasks;
+  global.Function.setTaskStatusDirectly = completeAllTasksOfType;
+
   if (Game.time % 1000 === 0) {
       Memory.replacementsNeeded = [];
+  }
+
+  for (const roomName in Game.rooms) {
+    const room = Game.rooms[roomName];
+    taskManager.initRoomTasks(room);
+  }
+
+  for (const roomName in Game.rooms) {
+    const room = Game.rooms[roomName];
+    if(room.controller && room.controller.my) {
+        roomManager.listRoomTasks(room);
+    }
+  }
+
+  for(const roomName in Game.rooms) {
+    const room = Game.rooms[roomName];
+    if(room && room.controller && room.controller.my) {
+        roomManager.updateTaskStatuses(room);
+    }
+  }
+
+  // use RoomVisual to display task list
+  taskManager.getPendingTasksSummary(Game.rooms['W8N7']);
+
+  if (Game.time % 500 === 0) {
+    Object.values(Game.rooms).forEach(room => {
+        if (room.controller && room.controller.my) {
+            cleanupCompletedTasks(room);
+        }
+    });
   }
 
   RoomVisual.prototype.circle(29, 11, {fill: '#2A2A2A', radius: 1.1, opacity: 1});

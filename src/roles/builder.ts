@@ -1,14 +1,11 @@
 import { scavengerAttribute } from "attributes";
+import { taskManager } from "core";
+import { walkThisWay } from "utilities";
 
 export const roleBuilder = {
 
     /** @param {Creep} creep **/
     run: function(creep: Creep) {
-		const priorityBuildingsFlag = Game.flags["priority-buildings-border"];
-    	const isPriorityBuildingsOn = priorityBuildingsFlag?.color === COLOR_BLUE;
-
-		const intentionTrackingFlag = Game.flags["intention-tracking"];
-    	const isIntentionTrackingOn = intentionTrackingFlag && intentionTrackingFlag?.color === COLOR_BLUE;
 
 	    if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.building = false;
@@ -19,30 +16,30 @@ export const roleBuilder = {
 	        creep.say('🏗️');
 	    }
 
-	    if(creep.memory.building) {
-	        const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+	    if (creep.memory.building) {
+            let buildTask = creep.memory.currentTask && taskManager.getTasks(creep.room, 'builder', { id: creep.memory.currentTask }).pop();
+            new RoomVisual(creep.room.name).text('🏗️', creep.pos.x, creep.pos.y, { align: 'center', opacity: 0.8 });
+            //circle builder creep
+            new RoomVisual(creep.room.name).circle(creep.pos, { fill: 'transparent', radius: 0.55, stroke: '#ffcc00', strokeWidth: 0.15 });
 
-			if (isPriorityBuildingsOn) {
-				// 💡 info: encircle all prioritized structures
-				targets.forEach((structure) => {
-					new RoomVisual(creep.room.name).circle(structure.pos, {fill: 'transparent', radius: 0.55, stroke: 'yellow'});
-				});
-			}
-
-			if (isIntentionTrackingOn){
-				// 💡 info: for drawing on screen
-				new RoomVisual(creep.room.name).circle(targets?.[0].pos, {fill: 'transparent', radius: 0.55, stroke: 'red'});
-				// 💡 info: line between creep and destination
-				new RoomVisual(creep.room.name).line(creep.pos, targets?.[0].pos, {color: 'orange'});
-			}
-
-            if(targets.length) {
-                if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.travelTo(targets[0]);
+            if (!buildTask) {
+                const buildTasks = taskManager.getTasks(creep.room, 'builder', { status: 'pending' });
+                if (buildTasks.length > 0) {
+                    buildTask = buildTasks[0];
+                    creep.memory.currentTask = buildTask.id;
                 }
             }
-	    } else {
+
+            if (buildTask) {
+                const target = Game.getObjectById(buildTask.id) as ConstructionSite | null;
+                if (target) {
+                    walkThisWay.build(creep, target);
+                } else {
+                    delete creep.memory.currentTask;
+                }
+            }
+        } else {
             scavengerAttribute(creep);
-	    }
+        }
 	}
 };
