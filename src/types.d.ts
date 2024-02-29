@@ -16,7 +16,7 @@ declare global {
     destination?: RoomPosition;
   }
 
-  // type taskType = 'repair' | 'build' | 'upgrade' | 'haul' | 'scavenge';
+  // type taskType = 'repair' | 'build' | 'upgrade' | 'haul' | 'scavenge';[]
   // type taskStatus = 'pending' | 'in-progress';
 
   // type Task = {
