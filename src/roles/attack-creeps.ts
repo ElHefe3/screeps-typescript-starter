@@ -1,4 +1,5 @@
 import { idle } from "./idle";
+import { rally } from "./rally";
 
 export const roleDefender = {
     run(creep: Creep): void {
@@ -19,7 +20,7 @@ export const roleDefender = {
                 }
             }
         } else {
-            idle.run(creep);
+            rally.run(creep);
         }
     }
 };

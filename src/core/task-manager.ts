@@ -84,21 +84,13 @@ export const taskManager = {
 
             // Check if there are any pending tasks to display
             if (pendingTasks.length > 0) {
-                // Display a header for each creep type
-                new RoomVisual(room.name).text(`Pending ${creepType} tasks:`, 1, yPos++, {align: 'left', color: 'white'});
-
                 // Display each pending task
                 if (pendingTasks.length > 0) {
                     // Start with the role/creepType, followed by a square for each pending task
                     let visualRepresentation = `${creepType}: `;
 
-                    // Append a construction crane emoji for each task
-                    pendingTasks.forEach(() => {
-                        visualRepresentation += "🏗️ ";
-                    });
-
                     // Display the visual representation at the current yPos, then increment yPos for the next line
-                    new RoomVisual(room.name).text(visualRepresentation, 1, yPos++, {align: 'left', color: 'yellow'});
+                    new RoomVisual(room.name).text(`🏗️ x ${pendingTasks.length}`, 1, yPos++, {align: 'left', color: 'yellow'});
                 }
             }
         });

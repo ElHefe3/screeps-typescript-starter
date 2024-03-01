@@ -18,9 +18,6 @@ export const roleBuilder = {
 
 	    if (creep.memory.building) {
             let buildTask = creep.memory.currentTask && taskManager.getTasks(creep.room, 'builder', { id: creep.memory.currentTask }).pop();
-            new RoomVisual(creep.room.name).text('🏗️', creep.pos.x, creep.pos.y, { align: 'center', opacity: 0.8 });
-            //circle builder creep
-            new RoomVisual(creep.room.name).circle(creep.pos, { fill: 'transparent', radius: 0.55, stroke: '#ffcc00', strokeWidth: 0.15 });
 
             if (!buildTask) {
                 const buildTasks = taskManager.getTasks(creep.room, 'builder', { status: 'pending' });

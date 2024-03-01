@@ -7,6 +7,7 @@ interface RoomManager {
 
 const roomManager: RoomManager = {
     listRoomTasks: function(room: Room) {
+        // construction sites
         const constructionSites = room.find(FIND_CONSTRUCTION_SITES);
         for (const site of constructionSites) {
             const buildTask = {
@@ -19,6 +20,23 @@ const roomManager: RoomManager = {
             };
 
             taskManager.addTask(room, buildTask, 'builder');
+        }
+
+        // maintenance tasks
+        const structures = room.find(FIND_STRUCTURES);
+        for (const structure of structures) {
+            if (structure.hits < structure.hitsMax) {
+                const repairTask = {
+                    id: structure.id.toString(),
+                    type: 'repair' as const,
+                    status: 'pending' as const,
+                    priority: 1,
+                    maxCreeps: 2,
+                    assignedCreeps: [] satisfies string[],
+                };
+
+                taskManager.addTask(room, repairTask, 'maintainer');
+            }
         }
     },
 
@@ -37,11 +55,15 @@ const roomManager: RoomManager = {
                     const target = Game.getObjectById(task.id);
                     if (!target) {
                         task.status = 'completed';
-                        console.log(`Task ${task.id} completed and marked as such.`);
                     }
                 }
 
-                // Add similar checks for other task types here...
+                if (task.type === 'repair' && task.status === 'pending') {
+                    const target = Game.getObjectById(task.id) as HitpointEnabledStructures;
+                    if (!target || target.hits === target.hitsMax) {
+                        task.status = 'completed';
+                    }
+                }
             });
         });
     }

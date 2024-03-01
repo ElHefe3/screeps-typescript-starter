@@ -128,6 +128,25 @@ declare global {
   type HasPos = { pos: RoomPosition; };
 
   type CapacityEnabledStructures = StructureSpawn | StructureExtension | StructureTower | StructureStorage | StructureContainer;
+  type HitpointEnabledStructures = StructureRoad |
+    StructureContainer |
+    StructureRampart |
+    StructureWall |
+    StructureController |
+    StructureStorage |
+    StructureExtension |
+    StructureSpawn |
+    StructureTower |
+    StructureLab |
+    StructureLink |
+    StructureNuker |
+    StructurePowerSpawn |
+    StructureTerminal |
+    StructureFactory |
+    StructureObserver |
+    StructureExtractor |
+    StructurePortal |
+    StructureInvaderCore;
 }
 
 export {};
