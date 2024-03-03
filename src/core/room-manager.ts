@@ -1,3 +1,5 @@
+import { findHaulingTasks } from "./task-collectors/hauling";
+import { findStructuresToRepair } from "./task-collectors/maintenance";
 import { taskManager } from "./task-manager";
 
 interface RoomManager {
@@ -23,21 +25,33 @@ const roomManager: RoomManager = {
         }
 
         // maintenance tasks
-        const structures = room.find(FIND_STRUCTURES);
-        for (const structure of structures) {
-            if (structure.hits < structure.hitsMax) {
-                const repairTask = {
-                    id: structure.id.toString(),
-                    type: 'repair' as const,
-                    status: 'pending' as const,
-                    priority: 1,
-                    maxCreeps: 2,
-                    assignedCreeps: [] satisfies string[],
-                };
+        findStructuresToRepair(room).forEach(structure => {
+            const repairTask = {
+                id: structure.id.toString(),
+                type: 'repair' as const,
+                status: 'pending' as const,
+                priority: 1,
+                maxCreeps: 2,
+                assignedCreeps: [] satisfies string[],
+            };
 
-                taskManager.addTask(room, repairTask, 'maintainer');
-            }
-        }
+            taskManager.addTask(room, repairTask, 'maintainer');
+        });
+
+        // hauling tasks
+        findHaulingTasks(room).forEach(structure => {
+            const haulTask = {
+                id: structure.id.toString(),
+                type: 'haul' as const,
+                status: 'pending' as const,
+                priority: 1,
+                maxCreeps: 4,
+                assignedCreeps: [] satisfies string[],
+            };
+
+            taskManager.addTask(room, haulTask, 'hauler');
+        });
+
     },
 
     updateTaskStatuses: function(room: Room) {
@@ -55,6 +69,7 @@ const roomManager: RoomManager = {
                     const target = Game.getObjectById(task.id);
                     if (!target) {
                         task.status = 'completed';
+
                     }
                 }
 
@@ -62,6 +77,15 @@ const roomManager: RoomManager = {
                     const target = Game.getObjectById(task.id) as HitpointEnabledStructures;
                     if (!target || target.hits === target.hitsMax) {
                         task.status = 'completed';
+
+                    }
+                }
+
+                if (task.type === 'haul' && task.status === 'pending') {
+                    const target = Game.getObjectById(task.id) as CapacityEnabledStructures;
+                    if (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+                        task.status = 'completed';
+
                     }
                 }
             });

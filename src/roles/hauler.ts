@@ -27,14 +27,14 @@ export const roleHauler = (creep: Creep) => {
         });
 
         if(!(target?.structureType === STRUCTURE_SPAWN)) {
-            const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
+            const controllerStorage = Game.getObjectById('65e2e7dcdf997c11d9834f4f') as StructureStorage;
             target = controllerStorage.store.getFreeCapacity() > 1500
                 ? controllerStorage
                 : target;
         }
 
         if (creep.memory.hauling && target !== null) {
-            if(target.id === '65d7b6e3ab0f7711d3a144a2') {
+            if(target.id === '65e2e7dcdf997c11d9834f4f') {
                 creep.say("anywhere but here")
             } else {
                 creep.say('🚚 haulin\'');

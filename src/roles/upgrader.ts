@@ -23,7 +23,7 @@ export const roleUpgrader = {
             }
         }
         else {
-            const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
+            const controllerStorage = Game.getObjectById('65e2e7dcdf997c11d9834f4f') as StructureStorage;
             if(creep.withdraw(controllerStorage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                 creep.travelTo(controllerStorage);
             }
@@ -31,9 +31,9 @@ export const roleUpgrader = {
             if(!controllerStorage) scavengerAttribute(creep);
         }
 
-        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
+        const controllerStorage = Game.getObjectById('65e2e7dcdf997c11d9834f4f') as StructureStorage;
 
-        if(controllerStorage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+        if(controllerStorage?.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
             idle.run(creep);
         }
 	}

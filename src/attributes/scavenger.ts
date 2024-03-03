@@ -15,8 +15,9 @@ export const scavengerAttribute = (creep: Creep) => {
     const targetContainer = creep.pos.findClosestByPath(containers) as StructureContainer | null;
 
     creep.memory.destination = targetContainer?.pos;
-
-    if (targetContainer && targetContainer.id !== CONTROLLED_CONTAINER) {
+    if(droppedResource) {
+        walkThisWay.pickup(creep, droppedResource);
+    } else if (targetContainer && targetContainer.id !== CONTROLLED_CONTAINER) {
         walkThisWay.withdraw(creep, targetContainer);
     }
     else {
