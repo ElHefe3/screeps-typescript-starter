@@ -1,4 +1,4 @@
-import { scavengerAttribute } from "attributes";
+import { AbundanceMentalityAttribute, scavengerAttribute } from "attributes";
 import { taskManager } from "core";
 import { walkThisWay } from "utilities";
 
@@ -36,7 +36,7 @@ export const roleBuilder = {
                 }
             }
         } else {
-            scavengerAttribute(creep);
+            AbundanceMentalityAttribute(creep);
         }
 	}
 };

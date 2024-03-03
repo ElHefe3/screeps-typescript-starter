@@ -1,0 +1,14 @@
+{
+  "hauler": {
+    "emoticon": "🚚"
+  },
+  "builder": {
+    "emoticon": "🔨"
+  },
+  "upgrader": {
+    "emoticon": "🔝"
+  },
+  "maintainer": {
+    "emoticon": "🔧"
+  }
+}

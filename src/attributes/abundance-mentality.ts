@@ -1,25 +1,25 @@
-import { idle } from "roles/idle";
 import { findControllerStorage, walkThisWay } from "utilities";
 
-const DEFAULT_CONTAINER = '65d79d88df997c11d97d9737';
-
-export const scavengerAttribute = (creep: Creep) => {
+export const AbundanceMentalityAttribute = (creep: Creep) => {
     const controllerContainer = findControllerStorage(creep.room.controller as StructureController);
 
-    const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+    creep.memory.currentTask = undefined;
+
+    const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+        filter: (resource) => creep.pos.getRangeTo(resource) <= 2 && resource.amount > 10
+    });
 
     const containers = creep.room.find(FIND_STRUCTURES, {
         filter: (structure) => structure.structureType === STRUCTURE_CONTAINER &&
-                                structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                                structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0 &&
+                                structure.id !== controllerContainer?.id
     });
 
     const targetContainer = creep.pos.findClosestByPath(containers) as StructureContainer | null;
 
-    creep.memory.destination = targetContainer?.pos;
-
-    if(droppedResource?.amount && droppedResource.amount > 10) {
+    if(droppedResource) {
         walkThisWay.pickup(creep, droppedResource);
-    } else if (targetContainer && targetContainer.id !== controllerContainer?.id) {
+    } else if (targetContainer) {
         walkThisWay.withdraw(creep, targetContainer);
     }
-}
+};

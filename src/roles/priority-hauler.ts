@@ -1,10 +1,13 @@
 // todo: use the creep's memory alongside their limb count to determine if they are overpopulated
 
-import { scavengerAttribute } from "attributes";
+import { AbundanceMentalityAttribute } from "attributes";
 import { taskManager } from "core";
 import { walkThisWay } from "utilities";
 
 export const rolePriorityHauler = (creep: Creep) => {
+    const currentTaskInMemory = creep.memory.currentTask ?
+        taskManager.getTasks(creep.room, 'hauler', { id: creep.memory.currentTask })[0] as Task : null;
+
     if (creep.memory?.hauling && creep.store[RESOURCE_ENERGY] === 0) {
         creep.memory.hauling = false;
     }
@@ -14,8 +17,9 @@ export const rolePriorityHauler = (creep: Creep) => {
     }
 
     if (creep.memory.hauling) {
-        let haulTask  = creep.memory.currentTask ?
-            taskManager.getTasks(creep.room, 'hauler', { id: creep.memory.currentTask })[0] as Task : null;
+        if(currentTaskInMemory?.status === 'completed') creep.memory.currentTask = undefined;
+
+        let haulTask  = creep.memory.currentTask ? currentTaskInMemory : null;
 
         if(!haulTask) {
             const haulTasks = taskManager.getTasks(creep.room, 'hauler', { status: 'pending' });
@@ -28,6 +32,7 @@ export const rolePriorityHauler = (creep: Creep) => {
         if (haulTask) {
             const target = Game.getObjectById(haulTask.id) as StructureStorage | null;
             if (target) {
+                new RoomVisual(creep.room.name).line(creep.pos, target?.pos, { color: 'green' });
                 walkThisWay.transfer(creep, target);
             } else {
                 delete creep.memory.currentTask;
@@ -35,6 +40,6 @@ export const rolePriorityHauler = (creep: Creep) => {
         }
 
     } else {
-        scavengerAttribute(creep);
+        AbundanceMentalityAttribute(creep);
     }
 }

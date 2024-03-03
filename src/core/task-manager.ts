@@ -1,3 +1,5 @@
+import { creepTypeExpressionMapper } from "constant-values";
+
 export const taskManager = {
     initRoomTasks: function(room: Room) {
         if (!room.memory.taskManager) {
@@ -24,13 +26,17 @@ export const taskManager = {
             room.memory.taskManager.tasks[creepType] = [];
         }
 
-        const existingTaskIndex = room.memory.taskManager.tasks[creepType]?.findIndex(t => t.id === task.id);
+        const tasks = room.memory.taskManager.tasks[creepType];
+        const existingTaskIndex = tasks?.findIndex(t => t.id === task.id);
 
         if (existingTaskIndex === -1) {
-            room.memory.taskManager.tasks[creepType]?.push(task);
-        };
+            tasks?.push(task);
+            tasks?.sort((a, b) => a.priority - b.priority);
+        } else {
+            if(!tasks || !existingTaskIndex) return;
+            tasks[Number(existingTaskIndex)] && (tasks[Number(existingTaskIndex)].status = 'pending');
+        }
     },
-
 
 
     removeTask: function(room: Room, taskId: string, creepType: CreepType) {
@@ -87,10 +93,10 @@ export const taskManager = {
                 // Display each pending task
                 if (pendingTasks.length > 0) {
                     // Start with the role/creepType, followed by a square for each pending task
-                    let visualRepresentation = `${creepType}: `;
+                    let visualRepresentation = `${creepTypeExpressionMapper[creepType as keyof typeof creepTypeExpressionMapper]?.emoticon}: `;
 
-                    // Display the visual representation at the current yPos, then increment yPos for the next line
-                    new RoomVisual(room.name).text(`🏗️ x ${pendingTasks.length}`, 1, yPos++, {align: 'left', color: 'yellow'});
+                    new RoomVisual(room.name)
+                        .text(`${visualRepresentation} x ${pendingTasks.length}`, 1, yPos++, {align: 'left', color: 'yellow'});
                 }
             }
         });

@@ -33,5 +33,11 @@ export const walkThisWay = {
         if (creep.repair(target) === ERR_NOT_IN_RANGE) {
             creep.travelTo(target);
         }
+    },
+
+    upgrade: function(creep: Creep, target: StructureController) {
+        if (creep.upgradeController(target) === ERR_NOT_IN_RANGE) {
+            creep.travelTo(target);
+        }
     }
 }

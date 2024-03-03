@@ -7,6 +7,14 @@ interface RoomManager {
     updateTaskStatuses: (room: Room) => void;
 }
 
+const STRUCTURE_PRIORITY = {
+    spawn: 1,
+    extension: 2,
+    container: 3,
+    tower: 4,
+    storage: 5,
+};
+
 const roomManager: RoomManager = {
     listRoomTasks: function(room: Room) {
         // construction sites
@@ -17,7 +25,7 @@ const roomManager: RoomManager = {
                 type: 'build' as const ,
                 status: 'pending' as const,
                 priority: 1,
-                maxCreeps: 2,
+                maxCreeps: 3,
                 assignedCreeps: [] satisfies string[],
             };
 
@@ -44,7 +52,7 @@ const roomManager: RoomManager = {
                 id: structure.id.toString(),
                 type: 'haul' as const,
                 status: 'pending' as const,
-                priority: 1,
+                priority: STRUCTURE_PRIORITY[structure.structureType as keyof typeof STRUCTURE_PRIORITY],
                 maxCreeps: 4,
                 assignedCreeps: [] satisfies string[],
             };

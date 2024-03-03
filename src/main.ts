@@ -42,7 +42,7 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer',
 
 const MAX_CREEPS = {
   HARVESTER: 2,
-  BUILDER: 3,
+  BUILDER: 3  ,
   UPGRADER: 1,
   HAULER: 4,
   MAINTAINER: 1,
@@ -129,8 +129,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
       1,
       {align: 'left', opacity: 0.8}
   );
-
-  RoomVisual.prototype.circle(7, 24, {fill: '#2A2A2A', radius: 1.1, opacity: 1});
 
   for (const id in Memory.claimedStructures) {
     const structure = Game.getObjectById(id) as AnyStructure;
