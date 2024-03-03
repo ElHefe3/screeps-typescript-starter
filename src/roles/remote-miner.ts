@@ -4,7 +4,6 @@ const TARGET_ROOM_NAME = 'W8N6';
 const HOME_ROOM_NAME = 'W8N7';
 
 export const roleRemoteMiner = {
-    /** @param {Creep} creep **/
     run: function(creep: Creep) {
         const inTargetRoom = creep.room.name === TARGET_ROOM_NAME;
         const inHomeRoom = creep.room.name === HOME_ROOM_NAME;
@@ -20,9 +19,23 @@ export const roleRemoteMiner = {
                 const targetPos = new RoomPosition(25, 25, TARGET_ROOM_NAME);
                 creep.travelTo(targetPos);
             } else {
+                // First, try to find and pick up dropped resources in the target room
+                const droppedResources = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+                    filter: (r) => r.resourceType === RESOURCE_ENERGY
+                });
+                if (droppedResources) {
+                    if (creep.pickup(droppedResources) === ERR_NOT_IN_RANGE) {
+                        creep.travelTo(droppedResources);
+                        return; // Exit early to prioritize picking up resources
+                    }
+                }
+
+                // If no dropped resources or already picked up, proceed to harvest from a source
                 const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
                 if (source) {
-                    walkThisWay.harvest(creep, source);
+                    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+                        walkThisWay.harvest(creep, source);
+                    }
                 }
             }
         } else {
@@ -30,7 +43,6 @@ export const roleRemoteMiner = {
                 const homePos = new RoomPosition(25, 25, HOME_ROOM_NAME);
                 creep.travelTo(homePos);
             } else {
-                // Find all structures that can store energy, excluding containers
                 const targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return (structure.structureType === STRUCTURE_SPAWN ||
@@ -40,7 +52,6 @@ export const roleRemoteMiner = {
                     }
                 });
 
-                // If no suitable structures found, consider containers as a last resort
                 if (targets.length === 0) {
                     const containers = creep.room.find(FIND_STRUCTURES, {
                         filter: (structure) => {
@@ -54,7 +65,6 @@ export const roleRemoteMiner = {
                     }
                 }
 
-                // Attempt to deposit energy in the found targets
                 if (targets.length > 0) {
                     if (creep.transfer(targets[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                         creep.travelTo(targets[0]);

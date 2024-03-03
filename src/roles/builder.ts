@@ -1,19 +1,16 @@
-import { AbundanceMentalityAttribute, scavengerAttribute } from "attributes";
-import { taskManager } from "core";
+import { AbundanceMentalityAttribute } from "attributes";
 import { walkThisWay } from "utilities";
+import { taskManager } from "core";
 
 export const roleBuilder = {
-
     /** @param {Creep} creep **/
     run: function(creep: Creep) {
 
 	    if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.building = false;
-            creep.say('🔄');
 	    }
 	    if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
 	        creep.memory.building = true;
-	        creep.say('🏗️');
 	    }
 
 	    if (creep.memory.building) {
