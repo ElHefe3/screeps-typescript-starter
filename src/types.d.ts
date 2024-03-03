@@ -1,7 +1,10 @@
 // Assuming the rest of your Traveler class implementation remains unchanged.
 
 declare global {
-  // Extend CreepMemory with properties used by your Traveler.
+  interface Function {
+    cleanupCompletedTasks: (room: Room) => void;
+    setTaskStatusDirectly: (room: Room, creepType: CreepType) => void;
+  }
   interface CreepMemory {
     role: string;
     errors: string[];
@@ -14,41 +17,44 @@ declare global {
     _trav?: TravelData; // Make sure this matches the structure used by Traveler
     _travel?: any; // If this is used, define a more specific type if possible
     destination?: RoomPosition;
+    currentTask?: string;
   }
 
-  // type taskType = 'repair' | 'build' | 'upgrade' | 'haul' | 'scavenge';[]
-  // type taskStatus = 'pending' | 'in-progress';
+  type CreepType = 'harvester' | 'builder' | 'upgrader' | 'maintainer' | 'hauler' | 'remoteMiner';
 
-  // type Task = {
-  //   id: string;
-  //   type: taskType;
-  //   status: taskStatus;
-  // }
+  type TaskType = 'repair' | 'build' | 'upgrade' | 'haul' | 'scavenge';
 
-  interface TaskData {
+  type TaskStatus = 'pending' | 'in-progress' | 'completed';
+
+  type Task = {
     id: string;
-    type: string;
+    type: TaskType;
+    status: TaskStatus;
     priority: number;
     maxCreeps: number;
-    assignedCreeps: number;
-  }
+    assignedCreeps: string[];
+    completedAt?: number;
+  };
 
-  // Define an interface for the TaskManager
-  interface TaskManager {
-    tasks: TaskData[];
-    addTask: (task: TaskData) => void;
-    removeTask: (taskId: string) => void;
-    getTasks: () => TaskData[];
-    // Any other methods you have in taskManager
-  }
+  type TasksByCreepType = {
+    [key in CreepType]?: Task[];
+  };
 
-  // Extend the RoomMemory interface to include taskManager
+  type TaskManager = {
+    tasks: TasksByCreepType;
+    addTask: (task: Task, creepType: CreepType) => void;
+    removeTask: (taskId: string, creepType: CreepType) => void;
+    getTasks: (creepType: CreepType, filter?: Partial<Task>) => Task[];
+    assignTask: (creepName: string, taskId: string, creepType: CreepType) => boolean;
+    completeTask: (taskId: string, creepType: CreepType) => void;
+  };
+
   interface RoomMemory {
     avoid?: number;
     maintainedObjects?: string[];
-    maintenanceTaskList?: TaskData[];
-    taskManager?: TaskManager;
+    taskManager: TaskManager;
   }
+
 
   // Ensure Memory interface correctly declares any custom properties you use.
   interface Memory {
@@ -122,6 +128,25 @@ declare global {
   type HasPos = { pos: RoomPosition; };
 
   type CapacityEnabledStructures = StructureSpawn | StructureExtension | StructureTower | StructureStorage | StructureContainer;
+  type HitpointEnabledStructures = StructureRoad |
+    StructureContainer |
+    StructureRampart |
+    StructureWall |
+    StructureController |
+    StructureStorage |
+    StructureExtension |
+    StructureSpawn |
+    StructureTower |
+    StructureLab |
+    StructureLink |
+    StructureNuker |
+    StructurePowerSpawn |
+    StructureTerminal |
+    StructureFactory |
+    StructureObserver |
+    StructureExtractor |
+    StructurePortal |
+    StructureInvaderCore;
 }
 
 export {};

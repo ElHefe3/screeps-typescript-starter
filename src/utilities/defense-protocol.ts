@@ -24,13 +24,13 @@ const spawnAttackCreeps = (spawn: StructureSpawn) => {
     if (spawn.room.energyAvailable >= spawn.room.energyCapacityAvailable) {
         if (_.filter(Game.creeps, (creep) => creep.memory.role == 'melee').length < 1) {
             const newName = 'Melee' + Game.time;
-            spawn.spawnCreep([MOVE, ATTACK], newName, { memory: { role: 'melee', working: false, room: 'W8N7', errors: [] } });
+            spawn.spawnCreep([MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH], newName, { memory: { role: 'melee', working: false, room: 'W8N7', errors: [] } });
         }
 
         if (_.filter(Game.creeps, (creep) => creep.memory.role == 'ranged').length < 2) {
             for (let i = 0; i < 2; i++) {
                 const newName = 'Ranged' + Game.time + "-" + i;
-                spawn.spawnCreep([MOVE, RANGED_ATTACK], newName, { memory: { role: 'ranged', working: false, room: 'W8N7', errors: [] } });
+                spawn.spawnCreep([MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK], newName, { memory: { role: 'ranged', working: false, room: 'W8N7', errors: [] } });
             }
         }
     }

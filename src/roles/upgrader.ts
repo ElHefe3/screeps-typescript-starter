@@ -1,40 +1,29 @@
 import { scavengerAttribute } from "attributes";
 import { idle } from "./idle";
+import { findControllerStorage, walkThisWay } from "utilities";
 
 export const roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function(creep: Creep) {
+        const controller = creep.room.controller;
+        if(!controller) return;
+
+        const controllerStorage = findControllerStorage(controller);
+        if(!controllerStorage) return;
 
         if(creep.memory.upgrading && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.upgrading = false;
-            creep.say('🔄');
 	    }
+
 	    if(!creep.memory.upgrading && creep.store.getFreeCapacity() == 0) {
 	        creep.memory.upgrading = true;
-	        creep.say('⚡');
 	    }
 
-	    if(creep.memory.upgrading) {
-            if(creep.room.controller) {
-                if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.travelTo(creep.room.controller);
-                }
-            }
-        }
-        else {
-            const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
-            if(creep.withdraw(controllerStorage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.travelTo(controllerStorage);
-            }
+        if(!creep.memory.upgrading && controllerStorage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return;
 
-            if(!controllerStorage) scavengerAttribute(creep);
-        }
-
-        const controllerStorage = Game.getObjectById('65d7b6e3ab0f7711d3a144a2') as StructureStorage;
-
-        if(controllerStorage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-            idle.run(creep);
-        }
+	    creep.memory.upgrading
+            ? walkThisWay.upgrade(creep, controller as StructureController)
+            : walkThisWay.withdraw(creep, controllerStorage);
 	}
 };

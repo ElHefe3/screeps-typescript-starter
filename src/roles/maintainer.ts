@@ -1,4 +1,5 @@
 import { scavengerAttribute } from "attributes";
+import { taskManager } from "core";
 import { walkThisWay } from "utilities";
 
 // Ensure Memory structure for claimed repairs
@@ -8,77 +9,33 @@ if (!Memory.claimedStructures) {
 
 export const roleMaintainer = {
     run(creep: Creep): void {
-        if (!Memory.claimedStructures) {
-            Memory.claimedStructures = {};
-        }
-
-        if(creep.memory.maintaining && creep.store[RESOURCE_ENERGY] === 0) {
+        if (creep.memory.maintaining && creep.store[RESOURCE_ENERGY] === 0) {
             creep.memory.maintaining = false;
-            creep.say('🔄 gather');
-            // Unclaim the structure when switching to gathering
-            if (creep.memory.structureBeingRepaired) {
-                delete Memory.claimedStructures[creep.memory.structureBeingRepaired];
-                delete creep.memory.structureBeingRepaired;
-            }
+            creep.say('🔄');
         }
 
-        if(!creep.memory.maintaining && creep.store.getFreeCapacity() === 0) {
+        if (!creep.memory.maintaining && creep.store.getFreeCapacity() === 0) {
             creep.memory.maintaining = true;
-            creep.say('🛠 repair');
+            creep.say('🔧');
         }
 
-        // Find and prioritize containers, then other structures, excluding walls
-        let containersToRepair = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => structure.structureType === STRUCTURE_CONTAINER && structure.hits < structure.hitsMax
-        });
+        if (creep.memory.maintaining) {
+            let maintenanceTask  = creep.memory.currentTask && taskManager.getTasks(creep.room, 'maintainer', { id: creep.memory.currentTask }).pop();
 
-        let otherStructuresToRepair = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => structure.structureType !== STRUCTURE_WALL &&
-                                    structure.structureType !== STRUCTURE_CONTAINER &&
-                                    structure.structureType !== STRUCTURE_RAMPART &&
-                                    structure.hits < structure.hitsMax
-        });
-
-        let wallsToRepair = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => structure.structureType === STRUCTURE_WALL && structure.hits < structure.hitsMax
-        });
-
-        // Sorting logic for each category
-        containersToRepair.sort((a, b) => a.hits - b.hits);
-        otherStructuresToRepair.sort((a, b) => a.hits - b.hits);
-        wallsToRepair.sort((a, b) => a.hits - b.hits);
-
-        // Combine the sorted arrays
-        const structuresToRepair = [...containersToRepair, ...otherStructuresToRepair, ...wallsToRepair];
-
-        // filter structures not in the same room
-        const structuresToRepairSanitized = structuresToRepair.filter((structure) => structure.room.name === creep.room.name);
-
-        if(creep.memory.maintaining) {
-            let target = null;
-            const structureBeingRepaired = Game.getObjectById(creep.memory.structureBeingRepaired ?? '') as AnyStructure;
-
-            if (!creep.memory.structureBeingRepaired ||
-                (creep.memory.structureBeingRepaired &&
-                (!Memory.claimedStructures[creep.memory.structureBeingRepaired] ||
-                structureBeingRepaired.hits === structureBeingRepaired.hitsMax))) {
-                for (const structure of structuresToRepairSanitized) {
-                    if (!Memory.claimedStructures[structure.id]) {
-                        target = structure;
-                        Memory.claimedStructures[structure.id] = true;
-                        creep.memory.structureBeingRepaired = structure.id;
-                        break;
-                    }
+            if (!maintenanceTask) {
+                const maintenanceTasks = taskManager.getTasks(creep.room, 'maintainer', { status: 'pending' });
+                if (maintenanceTasks.length > 0) {
+                    maintenanceTask = maintenanceTasks[0];
+                    creep.memory.currentTask = maintenanceTask.id;
                 }
-            } else {
-                target = Game.getObjectById(creep.memory.structureBeingRepaired) as AnyStructure;
             }
 
-            if (target) {
-                walkThisWay.repair(creep, target);
-                if (target.hits === target.hitsMax) {
-                    delete Memory.claimedStructures[target.id];
-                    delete creep.memory.structureBeingRepaired;
+            if (maintenanceTask) {
+                const target = Game.getObjectById(maintenanceTask.id) as HitpointEnabledStructures | null;
+                if (target) {
+                    walkThisWay.repair(creep, target);
+                } else {
+                    delete creep.memory.currentTask;
                 }
             }
         } else {
