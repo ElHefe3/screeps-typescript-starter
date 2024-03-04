@@ -16,9 +16,13 @@ export const roleMaintainer = {
             creep.memory.maintaining = true;
         }
 
+        const currentTaskInMemory = creep.memory.currentTask ?
+            taskManager.getTask(creep.room, 'maintainer', creep.memory.currentTask) as Task : null;
+
         if (creep.memory.maintaining) {
-            let maintenanceTask  = creep.memory.currentTask &&
-                taskManager.getTasks(creep.room, 'maintainer', { id: creep.memory.currentTask }).pop();
+            if(currentTaskInMemory?.status === 'completed') creep.memory.currentTask = undefined;
+
+            let maintenanceTask  = creep.memory.currentTask ? currentTaskInMemory : null;
 
             if (!maintenanceTask) {
                 const maintenanceTasks = taskManager.getTasks(creep.room, 'maintainer', { status: 'pending' });

@@ -15,11 +15,20 @@ export const AbundanceMentalityAttribute = (creep: Creep) => {
                                 structure.id !== controllerContainer?.id
     });
 
+    const restOfDroppedResources = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+        filter: (resource) => resource.amount > 10
+    });
+
     const targetContainer = creep.pos.findClosestByPath(containers) as StructureContainer | null;
 
     if(droppedResource) {
         walkThisWay.pickup(creep, droppedResource);
     } else if (targetContainer) {
         walkThisWay.withdraw(creep, targetContainer);
+    } else {
+        if (restOfDroppedResources) {
+            walkThisWay.pickup(creep, restOfDroppedResources);
+        }
     }
+
 };

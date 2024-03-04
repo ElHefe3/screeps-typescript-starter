@@ -14,13 +14,8 @@ export const findStructuresToRepair = (room: Room) => {
         filter: (structure) => structure.structureType === STRUCTURE_WALL && structure.hits < structure.hitsMax
     });
 
-    // Sorting logic for each category
-    containersToRepair.sort((a, b) => a.hits - b.hits);
-    otherStructuresToRepair.sort((a, b) => a.hits - b.hits);
-    wallsToRepair.sort((a, b) => a.hits - b.hits);
-
     // Combine the sorted arrays
-    const structuresToRepair = [...containersToRepair, ...otherStructuresToRepair, ...wallsToRepair];
+    const structuresToRepair = [...containersToRepair, ...otherStructuresToRepair];
 
     // filter structures not in the same room
     return structuresToRepair.filter((structure) => structure.room.name === room.name);

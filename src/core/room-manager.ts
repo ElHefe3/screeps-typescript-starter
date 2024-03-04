@@ -14,8 +14,9 @@ const STRUCTURE_PRIORITY = {
     tower: 4,
     storage: 5,
     rampart: 6,
-    wall: 7,
-};
+    constructedWall: 8,
+    road: 7,
+}
 
 const roomManager: RoomManager = {
     listRoomTasks: function(room: Room) {
@@ -35,7 +36,7 @@ const roomManager: RoomManager = {
         }
 
         // maintenance tasks
-        findStructuresToRepair(room).forEach(structure => {
+        findStructuresToRepair(room).forEach((structure, index) => {
             const repairTask = {
                 id: structure.id.toString(),
                 type: 'repair' as const,

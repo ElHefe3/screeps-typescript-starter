@@ -1,4 +1,4 @@
-import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, roleHauler } from "roles";
+import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, roleHauler, roleColonizer } from "roles";
 import lifecycleManager from "environment/lifecycle";
 import { ErrorMapper } from "utils/ErrorMapper";
 import { defenseProtocol, spawnCreepWithRole } from "utilities";
@@ -7,8 +7,8 @@ import "environment/utils";
 import { roleDefender } from "roles/attack-creeps";
 import { roleRemoteMiner } from "roles/remote-miner";
 import { cleanupCompletedTasks, roomManager, taskManager, completeAllTasksOfType } from "core";
-import { roleRecoveryBot } from "roles/recovery";
 import { defconProtocol } from "defense-protocol/defense-protocol";
+import { recoveryMain } from "recovery/recovery";
 
 declare global {
   /*
@@ -39,15 +39,16 @@ declare global {
   }
 }
 
-const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer', 'remoteMiner', 'recovery'];
+const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer', 'remoteMiner', 'recovery', 'colonizer'];
 
 const MAX_CREEPS = {
   HARVESTER: 2,
   BUILDER: 3,
-  UPGRADER: 2,
+  UPGRADER: 3,
   HAULER: 4,
   MAINTAINER: 1,
-  REMOTE_MINER: 4,
+  REMOTE_MINER: 3,
+  COLONIZER: 1,
   RECOVERY: 0,
 };
 
@@ -60,6 +61,14 @@ export const loop = ErrorMapper.wrapLoop(() => {
   global.Function.setTaskStatusDirectly = completeAllTasksOfType;
 
   defcon.run();
+
+  const colonizeFlag = Game.flags['colonize'];
+  const spawnConstructionSite = colonizeFlag.room?.find(FIND_MY_CONSTRUCTION_SITES, {
+    filter: (site) => site.structureType === STRUCTURE_SPAWN
+  });
+  const hasSpawnConstructionSite = spawnConstructionSite && spawnConstructionSite.length > 0;
+  const spawns = colonizeFlag.room?.find(FIND_MY_SPAWNS).length;
+  const hasSpawn = spawns && spawns > 0;
 
   // if defocon flag use defcon-protocol yelllow
   if(Game.flags['defcon'].color === COLOR_YELLOW) {
@@ -145,41 +154,60 @@ export const loop = ErrorMapper.wrapLoop(() => {
     }
   }
 
-  const harvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
-  const builders = _.filter(Game.creeps, (creep) => creep.memory.role === 'builder');
-  const upgraders = _.filter(Game.creeps, (creep) => creep.memory.role === 'upgrader');
-  const haulers = _.filter(Game.creeps, (creep) => creep.memory.role === 'hauler');
-  const maintainers = _.filter(Game.creeps, (creep) => creep.memory.role === 'maintainer');
-  const remoteMiners = _.filter(Game.creeps, (creep) => creep.memory.role === 'remoteMiner');
-  const recovery = _.filter(Game.creeps, (creep) => creep.memory.role === 'recovery');
+  const harvesters = getCreepsByRoleAndRoom('harvester', 'W8N7');
+  const builders = getCreepsByRoleAndRoom('builder', 'W8N7');
+  const upgraders = getCreepsByRoleAndRoom('upgrader', 'W8N7');
+  const haulers = getCreepsByRoleAndRoom('hauler', 'W8N7');
+  const maintainers = getCreepsByRoleAndRoom('maintainer', 'W8N7');
+  const remoteMiners = getCreepsByRoleAndRoom('remoteMiner', 'W8N7');
+  const recovery = getCreepsByRoleAndRoom('recovery', 'W8N7');
+  const colonizers = getCreepsByRoleAndRoom('colonizer', 'W8N7');
+
+  function getCreepsByRoleAndRoom(role: string, roomName: string) {
+    return _.filter(Game.creeps, (creep) => creep.memory.role === role && creep.memory.room === roomName);
+  }
 
   if(harvesters.length < MAX_CREEPS.HARVESTER) {
-      spawnCreepWithRole('Spawn1', 'harvester', [WORK, WORK, WORK, WORK, WORK, MOVE]);
+      spawnCreepWithRole('Spawn1', 'harvester', [WORK, WORK, WORK, WORK, WORK, MOVE], 'W8N7');
   }
 
   else if(builders.length < MAX_CREEPS.BUILDER) {
-      spawnCreepWithRole('Spawn1', 'builder');
+      spawnCreepWithRole('Spawn1', 'builder', [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE], 'W8N7');
   }
 
   else if(haulers.length < MAX_CREEPS.HAULER) {
-    spawnCreepWithRole('Spawn1', 'hauler', [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE]);
+    spawnCreepWithRole('Spawn1', 'hauler', [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], 'W8N7');
   }
 
   else if(upgraders.length < MAX_CREEPS.UPGRADER) {
-      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE]);
+      spawnCreepWithRole('Spawn1', 'upgrader', [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE], 'W8N7');
   }
 
   else if(maintainers.length < MAX_CREEPS.MAINTAINER) {
-      spawnCreepWithRole('Spawn1', 'maintainer');
+      spawnCreepWithRole('Spawn1', 'maintainer', [WORK, WORK, CARRY, CARRY, MOVE, MOVE], 'W8N7');
   }
 
   else if(remoteMiners.length < MAX_CREEPS.REMOTE_MINER) {
-      spawnCreepWithRole('Spawn1', 'remoteMiner'), [WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY];
+      spawnCreepWithRole('Spawn1', 'remoteMiner', [WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY]);
   }
 
   else if(recovery.length < MAX_CREEPS.RECOVERY) {
-      spawnCreepWithRole('Spawn1', 'recovery', [WORK, CARRY, MOVE]);
+      spawnCreepWithRole('Spawn1', 'recovery', [WORK, CARRY, MOVE], 'W8N7');
   }
+
+  else if(colonizers.length < MAX_CREEPS.COLONIZER) {
+      spawnCreepWithRole('Spawn1', 'colonizer', [CLAIM, MOVE, MOVE, WORK, WORK, CARRY, CARRY], 'W8N7');
+  }
+
+  // // set colonizing flag according to stage
+  // // if room claimed, set to yellow
+  // if(colonizeFlag.room?.controller?.my) colonizeFlag.setColor(COLOR_YELLOW);
+  // // if room has spawn construction site, set to green
+  // if(hasSpawnConstructionSite) colonizeFlag.setColor(COLOR_GREEN);
+  // // if room has spawn, set to blue
+  if(hasSpawn) colonizeFlag.setColor(COLOR_BLUE);
+
+  if(colonizeFlag.color === COLOR_BLUE) recoveryMain();
 
   new RoomVisual().text(
     `Creeps `,
@@ -225,26 +253,37 @@ export const loop = ErrorMapper.wrapLoop(() => {
               roleUpgrader.run(creep);
           }
       }
-      if(creep.memory.role == 'hauler') {
+      if(creep.memory.role == 'hauler' && creep.memory.room === 'W8N7') {
           roleHauler.run(creep);
       }
-      if(creep.memory.role == 'maintainer') {
+      if(creep.memory.role == 'maintainer' && creep.memory.room === 'W8N7') {
           roleMaintainer.run(creep);
       }
-      if(creep.memory.role == 'melee') {
+      if(creep.memory.role == 'melee' && creep.memory.room === 'W8N7') {
         roleDefender.run(creep);
       }
-      if(creep.memory.role == 'ranged') {
+      if(creep.memory.role == 'ranged' && creep.memory.room === 'W8N7') {
         roleDefender.run(creep);
       }
       if(creep.memory.role == 'remoteMiner') {
         roleRemoteMiner.run(creep);
       }
-      if(creep.memory.role == 'recovery') {
+      if(creep.memory.role == 'recovery' && creep.memory.room === 'W8N7') {
         roleHauler.run(creep);
       }
-      if(defcon.currentDefconLevel() === 0 && creep.memory.role === 'defenseHauler') {
+      if(defcon.currentDefconLevel() === 0 && creep.memory.role === 'defenseHauler' && creep.room.name === 'W8N7') {
         roleHauler.run(creep);
+      }
+      if(creep.memory.role === 'colonizer') {
+        if(creep.room.name !== colonizeFlag.pos.roomName) {
+          roleColonizer.moveToColonize(creep);
+        } else if(creep.room.name === colonizeFlag.pos.roomName && !creep.room.controller?.my) {
+          roleColonizer.claimController(creep);
+        } else if(creep.room.name === colonizeFlag.pos.roomName && !hasSpawn) {
+          roleColonizer.constructSpawn(creep);
+        } else {
+          roleColonizer.upgradeController(creep);
+        }
       }
   }
 });
