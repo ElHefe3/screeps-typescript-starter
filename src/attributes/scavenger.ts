@@ -1,7 +1,4 @@
-import { idle } from "roles/idle";
 import { findControllerStorage, walkThisWay } from "utilities";
-
-const DEFAULT_CONTAINER = '65d79d88df997c11d97d9737';
 
 export const scavengerAttribute = (creep: Creep) => {
     const controllerContainer = findControllerStorage(creep.room.controller as StructureController);

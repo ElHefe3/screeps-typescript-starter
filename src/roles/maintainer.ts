@@ -1,8 +1,7 @@
 import { scavengerAttribute } from "attributes";
-import { taskManager } from "core";
 import { walkThisWay } from "utilities";
+import { taskManager } from "core";
 
-// Ensure Memory structure for claimed repairs
 if (!Memory.claimedStructures) {
     Memory.claimedStructures = [];
 }
@@ -11,16 +10,15 @@ export const roleMaintainer = {
     run(creep: Creep): void {
         if (creep.memory.maintaining && creep.store[RESOURCE_ENERGY] === 0) {
             creep.memory.maintaining = false;
-            creep.say('🔄');
         }
 
         if (!creep.memory.maintaining && creep.store.getFreeCapacity() === 0) {
             creep.memory.maintaining = true;
-            creep.say('🔧');
         }
 
         if (creep.memory.maintaining) {
-            let maintenanceTask  = creep.memory.currentTask && taskManager.getTasks(creep.room, 'maintainer', { id: creep.memory.currentTask }).pop();
+            let maintenanceTask  = creep.memory.currentTask &&
+                taskManager.getTasks(creep.room, 'maintainer', { id: creep.memory.currentTask }).pop();
 
             if (!maintenanceTask) {
                 const maintenanceTasks = taskManager.getTasks(creep.room, 'maintainer', { status: 'pending' });

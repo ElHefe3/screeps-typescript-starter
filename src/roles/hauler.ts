@@ -1,51 +1,47 @@
-import { scavengerAttribute } from "attributes";
-import { buildingExpressionMapper } from "constant-values";
+// todo: use the creep's memory alongside their limb count to determine if they are overpopulated
+
+import { AbundanceMentalityAttribute } from "attributes";
+import { taskManager } from "core";
 import { walkThisWay } from "utilities";
 
-export const roleHauler = (creep: Creep) => {
-    const { EXTENSION, RESOURCE } = buildingExpressionMapper;
+export const roleHauler = {
+    run: function(creep: Creep) {
+        const currentTaskInMemory = creep.memory.currentTask ?
+            taskManager.getTask(creep.room, 'hauler', creep.memory.currentTask) as Task : null;
 
+        if (creep.memory?.hauling && creep.store[RESOURCE_ENERGY] === 0) {
+            creep.memory.hauling = false;
+        }
 
-    if (creep.memory.hauling && creep.store[RESOURCE_ENERGY] === 0) {
-        creep.memory.hauling = false;
-        creep.say(RESOURCE.emoticon);
-    }
+        if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {
+            creep.memory.hauling = true;
+        }
 
-    if (!creep.memory.hauling && creep.store.getFreeCapacity() === 0) {
-        creep.memory.hauling = true;
-        creep.say('🚚');
-    }
+        if (creep.memory.hauling) {
+            if(currentTaskInMemory?.status === 'completed') creep.memory.currentTask = undefined;
 
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-        var target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-            filter: (structure) => {
-                return (structure.structureType === STRUCTURE_SPAWN ||
-                        structure.structureType === STRUCTURE_EXTENSION ||
-                        structure.structureType === STRUCTURE_TOWER) &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+            let haulTask  = creep.memory.currentTask ? currentTaskInMemory : null;
+
+            if(!haulTask) {
+                const haulTasks = taskManager.getTasks(creep.room, 'hauler', { status: 'pending' });
+                if (haulTasks.length > 0) {
+                    haulTask = haulTasks[0];
+                    creep.memory.currentTask = haulTask.id;
+                }
             }
-        });
 
-        if(!(target?.structureType === STRUCTURE_SPAWN)) {
-            const controllerStorage = Game.getObjectById('65e2e7dcdf997c11d9834f4f') as StructureStorage;
-            target = controllerStorage.store.getFreeCapacity() > 1500
-                ? controllerStorage
-                : target;
-        }
+            if (haulTask) {
+                const target = Game.getObjectById(haulTask.id) as StructureStorage | null;
+                if (target) {
+                    new RoomVisual(creep.room.name).line(creep.pos, target?.pos, { color: 'green' });
+                    walkThisWay.transfer(creep, target);
+                } else {
+                    delete creep.memory.currentTask;
+                }
+            }
 
-        if (creep.memory.hauling && target !== null) {
-            if(target.id === '65e2e7dcdf997c11d9834f4f') {
-                creep.say("anywhere but here")
-            } else {
-                creep.say('🚚 haulin\'');
-            };
-
-            walkThisWay.transfer(creep, target);
         } else {
-            creep.say('🔄');
-            scavengerAttribute(creep);
+            AbundanceMentalityAttribute(creep);
         }
-    } else {
-        scavengerAttribute(creep);
     }
 }

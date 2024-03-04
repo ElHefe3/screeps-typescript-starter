@@ -56,6 +56,10 @@ export const taskManager = {
         });
     },
 
+    getTask: function(room: Room, creepType: CreepType, taskId: string) {
+        return room.memory.taskManager.tasks[creepType]?.find(task => task.id === taskId);
+    },
+
     assignTask: function(room: Room, creepName: string, taskId: string, creepType: CreepType) {
         // @ts-expect-error
         const task = room.memory.taskManager.tasks[creepType].find(t => t.id === taskId && t.status === 'pending');
