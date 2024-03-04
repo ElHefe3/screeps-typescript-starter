@@ -1,13 +1,14 @@
-import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, rolePriorityHauler, roleHauler } from "roles";
+import { roleHarvester, roleUpgrader, roleBuilder, roleMaintainer, roleHauler } from "roles";
 import lifecycleManager from "environment/lifecycle";
 import { ErrorMapper } from "utils/ErrorMapper";
 import { defenseProtocol, spawnCreepWithRole } from "utilities";
-import { tower } from "environment";
+import { defcon, tower } from "environment";
 import "environment/utils";
 import { roleDefender } from "roles/attack-creeps";
 import { roleRemoteMiner } from "roles/remote-miner";
 import { cleanupCompletedTasks, roomManager, taskManager, completeAllTasksOfType } from "core";
 import { roleRecoveryBot } from "roles/recovery";
+import { defconProtocol } from "defense-protocol/defense-protocol";
 
 declare global {
   /*
@@ -42,11 +43,11 @@ const CREEP_NAMES = ['harvester', 'upgrader', 'builder', 'hauler', 'maintainer',
 
 const MAX_CREEPS = {
   HARVESTER: 2,
-  BUILDER: 3  ,
-  UPGRADER: 1,
+  BUILDER: 3,
+  UPGRADER: 2,
   HAULER: 4,
   MAINTAINER: 1,
-  REMOTE_MINER: 3,
+  REMOTE_MINER: 4,
   RECOVERY: 0,
 };
 
@@ -57,6 +58,13 @@ export const loop = ErrorMapper.wrapLoop(() => {
   global.Function = global.Function || {};
   global.Function.cleanupCompletedTasks = cleanupCompletedTasks;
   global.Function.setTaskStatusDirectly = completeAllTasksOfType;
+
+  defcon.run();
+
+  // if defocon flag use defcon-protocol yelllow
+  if(Game.flags['defcon'].color === COLOR_YELLOW) {
+    defconProtocol.yellow('W8N7');
+  }
 
   if (Game.time % 1000 === 0) {
       Memory.replacementsNeeded = [];
@@ -218,7 +226,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
           }
       }
       if(creep.memory.role == 'hauler') {
-          rolePriorityHauler(creep);
+          roleHauler.run(creep);
       }
       if(creep.memory.role == 'maintainer') {
           roleMaintainer.run(creep);
@@ -233,7 +241,10 @@ export const loop = ErrorMapper.wrapLoop(() => {
         roleRemoteMiner.run(creep);
       }
       if(creep.memory.role == 'recovery') {
-        rolePriorityHauler(creep);
+        roleHauler.run(creep);
+      }
+      if(defcon.currentDefconLevel() === 0 && creep.memory.role === 'defenseHauler') {
+        roleHauler.run(creep);
       }
   }
 });

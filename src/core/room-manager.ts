@@ -13,6 +13,8 @@ const STRUCTURE_PRIORITY = {
     container: 3,
     tower: 4,
     storage: 5,
+    rampart: 6,
+    wall: 7,
 };
 
 const roomManager: RoomManager = {
@@ -38,7 +40,7 @@ const roomManager: RoomManager = {
                 id: structure.id.toString(),
                 type: 'repair' as const,
                 status: 'pending' as const,
-                priority: 1,
+                priority: STRUCTURE_PRIORITY[structure.structureType as keyof typeof STRUCTURE_PRIORITY],
                 maxCreeps: 2,
                 assignedCreeps: [] satisfies string[],
             };
