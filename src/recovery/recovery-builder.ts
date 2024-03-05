@@ -6,13 +6,13 @@ export const roleRecoveryBuilder = {
         const spawnRoom = Game.rooms[creep.memory.room]; // Assuming spawnRoom is the name of the room
 
         if (creep.store.getFreeCapacity() > 0 && !creep.memory.hauling) {
-            // Harvest energy if the creep is not full and not currently hauling
-            var source = creep.pos.findClosestByPath(FIND_SOURCES, {
-                filter: (s) => s.energy > 0 && s.room.name === spawnRoom.name
+            // get energy from containers
+            const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: s => (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] > 0
             });
 
-            if (source) {
-                walkThisWay.harvest(creep, source);
+            if (container) {
+                walkThisWay.withdraw(creep, container);
             }
         } else {
             creep.memory.hauling = true;

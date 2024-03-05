@@ -9,6 +9,10 @@ import { roleRemoteMiner } from "roles/remote-miner";
 import { cleanupCompletedTasks, roomManager, taskManager, completeAllTasksOfType } from "core";
 import { defconProtocol } from "defense-protocol/defense-protocol";
 import { recoveryMain } from "recovery/recovery";
+import { roleBlockade } from "roles/blockade";
+import { rolePatroller } from "roles/patrol";
+import { roleScavenger } from "roles/scavenger";
+import { roleAttacker } from "roles/attacker";
 
 declare global {
   /*
@@ -50,6 +54,9 @@ const MAX_CREEPS = {
   REMOTE_MINER: 3,
   COLONIZER: 1,
   RECOVERY: 0,
+  BLOCKADE: 3,
+  SCAVENGER: 2,
+  ATTACKERS: 0,
 };
 
 var tickCount = 0;
@@ -159,12 +166,27 @@ export const loop = ErrorMapper.wrapLoop(() => {
   const upgraders = getCreepsByRoleAndRoom('upgrader', 'W8N7');
   const haulers = getCreepsByRoleAndRoom('hauler', 'W8N7');
   const maintainers = getCreepsByRoleAndRoom('maintainer', 'W8N7');
-  const remoteMiners = getCreepsByRoleAndRoom('remoteMiner', 'W8N7');
+  const remoteMiners = _.filter(Game.creeps, (creep) => creep.memory.role === 'remoteMiner');
   const recovery = getCreepsByRoleAndRoom('recovery', 'W8N7');
-  const colonizers = getCreepsByRoleAndRoom('colonizer', 'W8N7');
+  const colonizers = _.filter(Game.creeps, (creep) => creep.memory.role === 'colonizer');
+  const blockade = _.filter(Game.creeps, (creep) => creep.memory.role === 'blockade');
+  const scavengers = _.filter(Game.creeps, (creep) => creep.memory.role === 'scavenger');
+  const attackers = _.filter(Game.creeps, (creep) => creep.memory.role === 'attacker');
 
   function getCreepsByRoleAndRoom(role: string, roomName: string) {
     return _.filter(Game.creeps, (creep) => creep.memory.role === role && creep.memory.room === roomName);
+  }
+
+  if(attackers.length < MAX_CREEPS.ATTACKERS) {
+    spawnCreepWithRole('Spawn1', 'attacker', [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK], 'W8N7');
+  }
+
+  if(scavengers.length < MAX_CREEPS.SCAVENGER) {
+    spawnCreepWithRole('Spawn1', 'scavenger', [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], 'W8N7');
+  }
+
+  if(blockade.length < MAX_CREEPS.BLOCKADE) {
+    spawnCreepWithRole('Spawn1', 'blockade', [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK], 'W8N7');
   }
 
   if(harvesters.length < MAX_CREEPS.HARVESTER) {
@@ -284,6 +306,15 @@ export const loop = ErrorMapper.wrapLoop(() => {
         } else {
           roleColonizer.upgradeController(creep);
         }
+      }
+      if(creep.memory.role === 'blockade') {
+        rolePatroller.run(creep);
+      }
+      if(creep.memory.role === 'scavenger') {
+        roleScavenger.run(creep);
+      }
+      if(creep.memory.role === 'attacker') {
+        roleAttacker.run(creep);
       }
   }
 });

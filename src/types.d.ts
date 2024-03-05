@@ -61,7 +61,22 @@ declare global {
     replacementsNeeded: string[];
     empire: any;
     claimedStructures: any;
+
     // Add any other custom properties used by your scripts.
+  }
+
+  interface SpawnQueueItem {
+      body?: BodyPartConstant[];
+      memory?: CreepMemory;
+      priority?: 'high' | 'medium' | 'low';
+      room?: string;
+      spawn?: string;
+  }
+
+  interface SpawnMemory {
+    active?: boolean;
+    lastSpawnTime?: number;
+    spawnQueue: SpawnQueueItem[];
   }
 
   // Define or extend interfaces for your Traveler-specific types.
